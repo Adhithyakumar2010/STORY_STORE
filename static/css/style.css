@@ -1,0 +1,817 @@
+/* ==========================================================================
+   AK STORY STORE - BASE STYLESHEET (style.css)
+   Modern, responsive design with CSS variables, resets, and glassmorphism
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CSS VARIABLES (DESIGN SYSTEM)
+   -------------------------------------------------------------------------- */
+:root {
+    /* Color Palette */
+    --first-color: #ff4820;
+    --first-color-alt: #e03713;
+    --first-color-light: rgba(255, 72, 32, 0.15);
+    --title-color: #ffffff;
+    --text-color: #d1d5db;
+    --text-color-light: #9ca3af;
+    --body-color: #0b0c10;
+    --container-color: #12141c;
+    --card-border: rgba(255, 255, 255, 0.08);
+    --glass-bg: rgba(18, 20, 28, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    
+    /* Font & Typography */
+    --body-font: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --title-font: 'Outfit', sans-serif;
+    
+    --biggest-font-size: 2.75rem;
+    --h1-font-size: 2.25rem;
+    --h2-font-size: 1.75rem;
+    --h3-font-size: 1.25rem;
+    --normal-font-size: 1rem;
+    --small-font-size: 0.875rem;
+    --smaller-font-size: 0.75rem;
+    
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-black: 800;
+    
+    /* Layout & Shadows */
+    --header-height: 4.5rem;
+    --border-radius-sm: 0.5rem;
+    --border-radius-md: 1rem;
+    --border-radius-lg: 1.5rem;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 0 25px rgba(255, 72, 32, 0.25);
+    
+    /* Transitions */
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --z-fixed: 100;
+}
+
+@media screen and (min-width: 968px) {
+    :root {
+        --biggest-font-size: 3.75rem;
+        --h1-font-size: 2.75rem;
+        --h2-font-size: 2rem;
+        --h3-font-size: 1.5rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   2. CSS RESET
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body.site-body {
+    font-family: var(--body-font);
+    font-size: var(--normal-font-size);
+    background-color: var(--body-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--title-font);
+    color: var(--title-color);
+    font-weight: var(--font-bold);
+    line-height: 1.2;
+}
+
+ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition-fast);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    border: none;
+    outline: none;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   3. REUSABLE LAYOUT & UTILITIES
+   -------------------------------------------------------------------------- */
+.container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+}
+
+.section-subtitle {
+    display: inline-block;
+    color: var(--first-color);
+    font-weight: var(--font-semibold);
+    font-size: var(--small-font-size);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.5rem;
+}
+
+.section-title {
+    font-size: var(--h2-font-size);
+}
+
+.see-all-link {
+    color: var(--first-color);
+    font-weight: var(--font-medium);
+}
+
+.see-all-link:hover {
+    color: var(--title-color);
+}
+
+.glassmorphism {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #ffffff 0%, var(--first-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   4. BUTTON STYLES
+   -------------------------------------------------------------------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: var(--font-semibold);
+    font-size: var(--small-font-size);
+    transition: var(--transition-normal);
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--first-color);
+    color: #ffffff;
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:hover {
+    background-color: var(--first-color-alt);
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(255, 72, 32, 0.4);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--title-color);
+    border: 1px solid var(--card-border);
+}
+
+.btn-outline:hover {
+    border-color: var(--first-color);
+    color: var(--first-color);
+    transform: translateY(-2px);
+}
+
+.btn-ghost {
+    background: var(--first-color-light);
+    color: var(--first-color);
+}
+
+.btn-ghost:hover {
+    background: var(--first-color);
+    color: #ffffff;
+}
+
+.btn-sm {
+    padding: 0.55rem 1.1rem;
+    font-size: var(--smaller-font-size);
+}
+
+/* --------------------------------------------------------------------------
+   5. HEADER & NAVIGATION STYLING
+   -------------------------------------------------------------------------- */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    z-index: var(--z-fixed);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--card-border);
+    transition: var(--transition-normal);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.nav-logo {
+    font-family: var(--title-font);
+    font-size: 1.5rem;
+    font-weight: var(--font-black);
+    color: var(--title-color);
+    letter-spacing: 0.5px;
+}
+
+.nav-logo span {
+    color: var(--first-color);
+}
+
+.nav-list {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: var(--text-color);
+    font-weight: var(--font-medium);
+    font-size: var(--small-font-size);
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--first-color);
+}
+
+.nav-cart-link {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.cart-badge {
+    background-color: var(--first-color);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: var(--font-bold);
+    padding: 0.15rem 0.45rem;
+    border-radius: 1rem;
+}
+
+.btn-link {
+    padding: 0.45rem 1.1rem;
+    border-radius: var(--border-radius-sm);
+    background: var(--first-color-light);
+    color: var(--first-color);
+}
+
+.btn-link:hover {
+    background: var(--first-color);
+    color: #ffffff;
+}
+
+.nav-toggle, .nav-close {
+    display: none;
+    background: transparent;
+    color: var(--title-color);
+    font-size: 1.5rem;
+}
+
+.hamburger-bar {
+    display: block;
+    width: 24px;
+    height: 2px;
+    margin: 5px 0;
+    background-color: var(--title-color);
+    transition: var(--transition-fast);
+}
+
+/* --------------------------------------------------------------------------
+   6. HERO SECTION STYLING
+   -------------------------------------------------------------------------- */
+.hero-section {
+    padding-top: calc(var(--header-height) + 4rem);
+    padding-bottom: 5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-container {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 3rem;
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    background: var(--first-color-light);
+    color: var(--first-color);
+    font-size: var(--small-font-size);
+    font-weight: var(--font-semibold);
+    margin-bottom: 1.25rem;
+}
+
+.hero-title {
+    font-size: var(--biggest-font-size);
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.5px;
+}
+
+.hero-description {
+    font-size: var(--normal-font-size);
+    color: var(--text-color-light);
+    margin-bottom: 2.25rem;
+    max-width: 540px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--card-border);
+}
+
+.stat-number {
+    display: block;
+    font-family: var(--title-font);
+    font-size: 1.75rem;
+    font-weight: var(--font-bold);
+    color: var(--title-color);
+}
+
+.stat-label {
+    font-size: var(--smaller-font-size);
+    color: var(--text-color-light);
+}
+
+.hero-image-wrapper {
+    position: relative;
+    text-align: center;
+}
+
+.hero-img-backdrop {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(255,72,32,0.3) 0%, rgba(0,0,0,0) 70%);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.hero-img {
+    position: relative;
+    z-index: 1;
+    max-width: 85%;
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+    transition: var(--transition-normal);
+}
+
+.hero-img:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+.floating-card {
+    position: absolute;
+    bottom: 10%;
+    left: -5%;
+    z-index: 2;
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    text-align: left;
+    box-shadow: var(--shadow-md);
+}
+
+.floating-icon {
+    font-size: 1.75rem;
+}
+
+.floating-card strong {
+    display: block;
+    color: var(--title-color);
+    font-size: var(--small-font-size);
+}
+
+.floating-card small {
+    color: var(--text-color-light);
+    font-size: var(--smaller-font-size);
+}
+
+/* --------------------------------------------------------------------------
+   7. FEATURES & PERKS SECTION
+   -------------------------------------------------------------------------- */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.feature-card {
+    background-color: var(--container-color);
+    border: 1px solid var(--card-border);
+    padding: 2rem 1.5rem;
+    border-radius: var(--border-radius-md);
+    transition: var(--transition-normal);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--first-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.feature-icon {
+    font-size: 2.25rem;
+    margin-bottom: 1rem;
+}
+
+.feature-title {
+    font-size: var(--h3-font-size);
+    margin-bottom: 0.5rem;
+}
+
+.feature-desc {
+    font-size: var(--small-font-size);
+    color: var(--text-color-light);
+}
+
+/* --------------------------------------------------------------------------
+   8. BOOKS GRID & CARDS
+   -------------------------------------------------------------------------- */
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.75rem;
+}
+
+.book-card {
+    background: var(--container-color);
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    transition: var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+}
+
+.book-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 72, 32, 0.4);
+    box-shadow: var(--shadow-md);
+}
+
+.book-card-img-wrapper {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+    background: #000;
+}
+
+.book-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-normal);
+}
+
+.book-card:hover .book-card-img {
+    transform: scale(1.05);
+}
+
+.book-tag {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--first-color);
+    color: #ffffff;
+    font-size: var(--smaller-font-size);
+    font-weight: var(--font-semibold);
+    padding: 0.25rem 0.65rem;
+    border-radius: 1rem;
+}
+
+.book-card-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.book-genre {
+    font-size: var(--smaller-font-size);
+    color: var(--first-color);
+    font-weight: var(--font-medium);
+    margin-bottom: 0.25rem;
+}
+
+.book-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.35rem;
+    line-height: 1.3;
+}
+
+.book-title a:hover {
+    color: var(--first-color);
+}
+
+.book-author {
+    font-size: var(--small-font-size);
+    color: var(--text-color-light);
+    margin-bottom: 1.25rem;
+}
+
+.book-card-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--card-border);
+}
+
+.book-price {
+    font-family: var(--title-font);
+    font-size: 1.25rem;
+    font-weight: var(--font-bold);
+    color: var(--title-color);
+}
+
+/* --------------------------------------------------------------------------
+   9. CTA BANNER SECTION
+   -------------------------------------------------------------------------- */
+.cta-section {
+    padding-bottom: 5rem;
+}
+
+.cta-container {
+    padding: 3.5rem 3rem;
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    background: linear-gradient(135deg, rgba(18,20,28,0.9) 0%, rgba(255,72,32,0.15) 100%);
+}
+
+.cta-title {
+    font-size: var(--h2-font-size);
+    margin-bottom: 0.5rem;
+}
+
+.cta-desc {
+    color: var(--text-color-light);
+    max-width: 550px;
+}
+
+/* --------------------------------------------------------------------------
+   10. FOOTER STYLING & SCROLL-TOP BUTTON
+   -------------------------------------------------------------------------- */
+.footer {
+    background-color: #07080b;
+    border-top: 1px solid var(--card-border);
+    padding-top: 4rem;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+    gap: 3rem;
+    padding-bottom: 3.5rem;
+}
+
+.footer-logo {
+    font-family: var(--title-font);
+    font-size: 1.5rem;
+    font-weight: var(--font-black);
+    color: var(--title-color);
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.footer-logo span {
+    color: var(--first-color);
+}
+
+.footer-desc {
+    font-size: var(--small-font-size);
+    color: var(--text-color-light);
+    max-width: 280px;
+}
+
+.footer-title {
+    font-size: var(--h3-font-size);
+    margin-bottom: 1.25rem;
+}
+
+.footer-links li {
+    margin-bottom: 0.65rem;
+}
+
+.footer-links a {
+    font-size: var(--small-font-size);
+    color: var(--text-color-light);
+}
+
+.footer-links a:hover {
+    color: var(--first-color);
+}
+
+.footer-info {
+    font-size: var(--small-font-size);
+    color: var(--text-color-light);
+    margin-bottom: 0.65rem;
+}
+
+.footer-bottom {
+    border-top: 1px solid var(--card-border);
+    padding: 1.5rem 0;
+}
+
+.footer-bottom-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--small-font-size);
+    color: var(--text-color-light);
+}
+
+.scroll-top-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 44px;
+    height: 44px;
+    background-color: var(--first-color);
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: var(--shadow-glow);
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition-normal);
+    z-index: var(--z-fixed);
+}
+
+.scroll-top-btn.show-scroll {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-top-btn:hover {
+    background-color: var(--first-color-alt);
+    transform: translateY(-3px);
+}
+
+/* --------------------------------------------------------------------------
+   11. MOBILE RESPONSIVENESS & MEDIA QUERIES
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 968px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .hero-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+
+    .hero-stats {
+        justify-content: center;
+    }
+
+    .floating-card {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+    }
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .books-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cta-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 320px;
+        height: 100vh;
+        background-color: var(--container-color);
+        padding: 4rem 2rem;
+        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
+        transition: var(--transition-normal);
+        z-index: var(--z-fixed);
+    }
+
+    .nav-menu.show-menu {
+        right: 0;
+    }
+
+    .nav-list {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .nav-toggle, .nav-close {
+        display: block;
+    }
+
+    .nav-close {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .features-grid, .books-grid, .footer-container {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-title {
+        font-size: 2.1rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+    }
+}

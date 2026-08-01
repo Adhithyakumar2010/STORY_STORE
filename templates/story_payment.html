@@ -163,11 +163,11 @@
                         <!-- TAB 2: UPI / QR -->
                         <div class="payment-panel-content" id="panel-upi">
                             <div style="background:rgba(0,0,0,0.3); border:1px solid var(--card-border); border-radius:.75rem; padding:1.5rem; text-align:center; margin-bottom:1.5rem;">
-                                <img src="{{ url_for('story_payment_qr') }}" alt="UPI QR Code" style="width:180px; height:180px; border-radius:.5rem; margin:0 auto 1rem; border:6px solid #ffffff; display:block;">
+                                <img src="{{ url_for('story_payment_qr', amount=amount) }}" alt="UPI QR Code" style="width:180px; height:180px; border-radius:.5rem; margin:0 auto 1rem; border:6px solid #ffffff; display:block;">
                                 <p style="color:var(--title-color); font-weight:var(--font-bold); margin-bottom:.25rem;">Scan QR with any UPI App</p>
                                 <div style="display:flex; justify-content:center; align-items:center; gap:.5rem; margin-bottom:1rem;">
-                                    <span style="font-size:var(--small-font-size); color:var(--text-color-light);">UPI ID: <strong style="color:var(--title-color);" id="upiIdText">payments@akclicks</strong></span>
-                                    <button type="button" onclick="navigator.clipboard.writeText('payments@akclicks'); alert('UPI ID copied to clipboard!');" class="button button--ghost" style="padding:.2rem .6rem; font-size:.75rem;">Copy</button>
+                                    <span style="font-size:var(--small-font-size); color:var(--text-color-light);">UPI ID: <strong style="color:var(--title-color);" id="upiIdText">{{ upi_id }}</strong></span>
+                                    <button type="button" onclick="navigator.clipboard.writeText('{{ upi_id }}'); alert('UPI ID copied to clipboard!');" class="button button--ghost" style="padding:.2rem .6rem; font-size:.75rem;">Copy</button>
                                 </div>
                                 <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; font-size:var(--smaller-font-size); color:var(--text-color-light);">
                                     <span>Google Pay</span> &bull; <span>PhonePe</span> &bull; <span>Paytm</span> &bull; <span>BHIM</span>

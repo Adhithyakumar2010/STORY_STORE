@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover, read, and order your favorite novels, thrillers, fantasy, and storybooks at AK Story Store. Fast delivery & instant reading.">
+    <meta name="author" content="AK Story Store">
+    <title>AK Story Store | Online Bookshop & Story Library</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="site-body">
+
+    <!-- Header & Navigation -->
+    <header class="header" id="header">
+        <div class="container nav-container">
+            <a href="{{ url_for('story_home') }}" class="nav-logo">
+                AK <span>STORY STORE</span>
+            </a>
+
+            <nav class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="{{ url_for('story_home') }}" class="nav-link active">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('story_books') }}" class="nav-link">Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('story_categories') }}" class="nav-link">Categories</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('story_cart') }}" class="nav-link nav-cart-link">
+                            🛒 Cart <span class="cart-badge">{{ cart_count|default(0) }}</span>
+                        </a>
+                    </li>
+                    {% if session.get('story_customer_id') %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('story_customer_dashboard') }}" class="nav-link btn-link">Dashboard</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('story_customer_login') }}" class="nav-link btn-link">Sign In</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <button class="nav-close" id="nav-close" aria-label="Close Navigation Menu">&times;</button>
+            </nav>
+
+            <div class="nav-actions">
+                <button class="nav-toggle" id="nav-toggle" aria-label="Open Navigation Menu">
+                    <span class="hamburger-bar"></span>
+                    <span class="hamburger-bar"></span>
+                    <span class="hamburger-bar"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="container hero-container">
+                <div class="hero-data">
+                    <span class="hero-badge">✨ Explore Unlimited Stories</span>
+                    <h1 class="hero-title">Immerse Yourself in<br><span class="gradient-text">Unforgettable Books</span></h1>
+                    <p class="hero-description">
+                        From gripping thrillers and fantasy adventures to heartfelt romance and timeless classics. Discover your next favorite story at AK Story Store today.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('story_books') }}" class="btn btn-primary">Browse Catalog &rarr;</a>
+                        <a href="#featured" class="btn btn-outline">Featured Picks</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">10,000+</span>
+                            <span class="stat-label">Happy Readers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">500+</span>
+                            <span class="stat-label">Curated Titles</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">4.9 ★</span>
+                            <span class="stat-label">Rating</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-image-wrapper">
+                    <div class="hero-img-backdrop"></div>
+                    <img src="{{ url_for('static', filename='images/story-store/about-img.png') }}" alt="AK Story Store Showcase" class="hero-img">
+                    <div class="floating-card glassmorphism">
+                        <span class="floating-icon">📚</span>
+                        <div>
+                            <strong>Bestseller Released</strong>
+                            <small>Ken Follett &middot; The Armor of Light</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features / Perks Section -->
+        <section class="features-section section">
+            <div class="container features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚚</div>
+                    <h3 class="feature-title">Express Delivery</h3>
+                    <p class="feature-desc">Fast, reliable doorstep delivery anywhere within 3 to 5 business days.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Secure Payments</h3>
+                    <p class="feature-desc">100% safe transactions via Razorpay, UPI, Credit/Debit cards & COD.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📖</div>
+                    <h3 class="feature-title">Instant Digital Reader</h3>
+                    <p class="feature-desc">Track your reading progress seamlessly on any desktop or mobile device.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎁</div>
+                    <h3 class="feature-title">Exclusive Rewards</h3>
+                    <p class="feature-desc">Earn reward points on every order and unlock special story discount coupons.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Books Section -->
+        <section class="featured-section section" id="featured">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <span class="section-subtitle">Top Selection</span>
+                        <h2 class="section-title">Featured Bestsellers</h2>
+                    </div>
+                    <a href="{{ url_for('story_books') }}" class="see-all-link">View All Books &rarr;</a>
+                </div>
+
+                <div class="books-grid">
+                    {% if bestsellers %}
+                        {% for book in bestsellers %}
+                        <div class="book-card">
+                            <div class="book-card-img-wrapper">
+                                <img src="{{ url_for('static', filename=book.image) }}" alt="{{ book.name }}" class="book-card-img">
+                                <span class="book-tag">Bestseller</span>
+                            </div>
+                            <div class="book-card-content">
+                                <span class="book-genre">{{ book.genre|default(book.category) }}</span>
+                                <h3 class="book-title"><a href="{{ url_for('story_book_details', book_id=book.id) }}">{{ book.name }}</a></h3>
+                                <p class="book-author">by {{ book.author }}</p>
+                                <div class="book-card-footer">
+                                    <div class="book-price">₹{{ book.price }}</div>
+                                    <form action="{{ url_for('story_cart_add') }}" method="post" class="add-cart-form">
+                                        <input type="hidden" name="book_id" value="{{ book.id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="book-card">
+                            <div class="book-card-img-wrapper">
+                                <img src="{{ url_for('static', filename='images/story-store/trick-treat1-img.jpeg') }}" alt="The Armor of Light" class="book-card-img">
+                                <span class="book-tag">Bestseller</span>
+                            </div>
+                            <div class="book-card-content">
+                                <span class="book-genre">Historical Fiction</span>
+                                <h3 class="book-title"><a href="{{ url_for('story_books') }}">The Armor of Light</a></h3>
+                                <p class="book-author">by Ken Follett</p>
+                                <div class="book-card-footer">
+                                    <div class="book-price">₹299</div>
+                                    <a href="{{ url_for('story_books') }}" class="btn btn-sm btn-primary">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-card">
+                            <div class="book-card-img-wrapper">
+                                <img src="{{ url_for('static', filename='images/story-store/trick-treat3-img.jpeg') }}" alt="Harry Potter" class="book-card-img">
+                                <span class="book-tag">Fantasy</span>
+                            </div>
+                            <div class="book-card-content">
+                                <span class="book-genre">Fantasy & Sci-Fi</span>
+                                <h3 class="book-title"><a href="{{ url_for('story_books') }}">Harry Potter Series</a></h3>
+                                <p class="book-author">by J.K. Rowling</p>
+                                <div class="book-card-footer">
+                                    <div class="book-price">₹784</div>
+                                    <a href="{{ url_for('story_books') }}" class="btn btn-sm btn-primary">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-card">
+                            <div class="book-card-img-wrapper">
+                                <img src="{{ url_for('static', filename='images/story-store/trick-treat5-img.jpg') }}" alt="The Lord of the Rings" class="book-card-img">
+                                <span class="book-tag">Classic</span>
+                            </div>
+                            <div class="book-card-content">
+                                <span class="book-genre">Epic Fantasy</span>
+                                <h3 class="book-title"><a href="{{ url_for('story_books') }}">The Lord of the Rings</a></h3>
+                                <p class="book-author">by J.R.R. Tolkien</p>
+                                <div class="book-card-footer">
+                                    <div class="book-price">₹989</div>
+                                    <a href="{{ url_for('story_books') }}" class="btn btn-sm btn-primary">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-card">
+                            <div class="book-card-img-wrapper">
+                                <img src="{{ url_for('static', filename='images/story-store/trick-treat6-img.jpg') }}" alt="Verity" class="book-card-img">
+                                <span class="book-tag">Thriller</span>
+                            </div>
+                            <div class="book-card-content">
+                                <span class="book-genre">Psychological Thriller</span>
+                                <h3 class="book-title"><a href="{{ url_for('story_books') }}">Verity</a></h3>
+                                <p class="book-author">by Colleen Hoover</p>
+                                <div class="book-card-footer">
+                                    <div class="book-price">₹536</div>
+                                    <a href="{{ url_for('story_books') }}" class="btn btn-sm btn-primary">Explore</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action Banner -->
+        <section class="cta-section">
+            <div class="container cta-container glassmorphism">
+                <div class="cta-content">
+                    <h2 class="cta-title">Ready to Start Your Reading Journey?</h2>
+                    <p class="cta-desc">Join thousands of book lovers. Sign up today for personalized book recommendations and exclusive offers.</p>
+                </div>
+                <div class="cta-actions">
+                    <a href="{{ url_for('story_customer_signup') }}" class="btn btn-primary">Create Free Account</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-col">
+                <a href="{{ url_for('story_home') }}" class="footer-logo">AK <span>STORY STORE</span></a>
+                <p class="footer-desc">Your ultimate online destination for storybooks, novels, thrillers, and magical literature.</p>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('story_home') }}">Home</a></li>
+                    <li><a href="{{ url_for('story_books') }}">Book Store</a></li>
+                    <li><a href="{{ url_for('story_categories') }}">Categories</a></li>
+                    <li><a href="{{ url_for('story_cart') }}">Shopping Cart</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-title">Customer Care</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('story_customer_login') }}">My Account</a></li>
+                    <li><a href="{{ url_for('story_wishlist') }}">Wishlist</a></li>
+                    <li><a href="{{ url_for('story_admin_login') }}">Admin Portal</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-title">Contact & Support</h4>
+                <p class="footer-info">📧 support@akclicks.com</p>
+                <p class="footer-info">📍 Coimbatore, Tamil Nadu, India</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container footer-bottom-container">
+                <p>&copy; 2026 AK Story Store. All rights reserved.</p>
+                <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">&uarr;</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

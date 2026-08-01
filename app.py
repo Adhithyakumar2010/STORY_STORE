@@ -13,6 +13,7 @@ import struct
 import time
 import uuid
 from collections import Counter
+from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode
 
@@ -26,18 +27,14 @@ from reportlab.pdfgen import canvas
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+from config import Config
 
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-this-before-production")
-app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
-app.config["MAIL_PORT"] = int(os.environ.get("MAIL_PORT", 587))
-app.config["MAIL_USE_TLS"] = os.environ.get("MAIL_USE_TLS", "true").lower() in ("true", "1", "on")
-app.config["MAIL_USE_SSL"] = os.environ.get("MAIL_USE_SSL", "false").lower() in ("true", "1", "on")
-app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
-app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
-app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app = Flask(__name__)
+app.config.from_object(Config)
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=1)
+
+# Module-level variable for direct reference & backward compatibility
+UPI_ID = app.config.get("UPI_ID", os.environ.get("UPI_ID", "payments@akclicks"))
 
 # Password Strength Validator
 def validate_password_strength(password):
@@ -79,6 +76,14 @@ def is_rate_limited(ip, endpoint, max_requests=30, window_seconds=60):
 
 mail = Mail(app)
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("story_home.html"), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return "<!DOCTYPE html><html><body style='font-family:sans-serif; text-align:center; padding:3rem; background:#0a0b09; color:#fff;'><h1>500 - Internal Server Error</h1><p>An unexpected error occurred. Please try again later.</p><a href='/' style='color:#ff4820;'>Return to Home</a></body></html>", 500
+
 def send_email_with_logs(recipient, subject, body):
     print(f"Customer Email: {recipient}", flush=True)
     print("Connecting to SMTP...", flush=True)
@@ -96,10 +101,18 @@ def send_email_with_logs(recipient, subject, body):
 
 
 
+@contextmanager
 def db_connection():
     conn = sqlite3.connect("story_store.db")
     conn.row_factory = sqlite3.Row
-    return conn
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 def catalog_products():
     with db_connection() as conn:
@@ -118,13 +131,19 @@ def queue_notification(conn, recipient, channel, subject, body):
         (channel, subject, body)
     )
 
-def log_admin_audit_action(action, module):
+def log_admin_audit_action(action, module="SECURITY", admin_name="Admin", status="SUCCESS", conn=None):
     try:
-        with db_connection() as conn:
+        if conn is not None:
             conn.execute(
-                "INSERT INTO story_admin_audit_logs (action, module) VALUES (?, ?)",
-                (action, module)
+                "INSERT INTO story_admin_audit_logs (admin_name, action, module, status) VALUES (?, ?, ?, ?)",
+                (admin_name, action, module, status)
             )
+        else:
+            with db_connection() as new_conn:
+                new_conn.execute(
+                    "INSERT INTO story_admin_audit_logs (admin_name, action, module, status) VALUES (?, ?, ?, ?)",
+                    (admin_name, action, module, status)
+                )
     except Exception:
         pass
 
@@ -136,6 +155,27 @@ def init_db():
                 name TEXT NOT NULL,
                 email TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
+                gender TEXT,
+                dob TEXT,
+                country TEXT,
+                state TEXT,
+                city TEXT,
+                pincode TEXT,
+                address TEXT,
+                language TEXT,
+                fav_genre TEXT,
+                fav_author TEXT,
+                bio TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS story_customers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                phone TEXT,
                 gender TEXT,
                 dob TEXT,
                 country TEXT,
@@ -194,6 +234,7 @@ def init_db():
                 total REAL NOT NULL,
                 items TEXT,
                 status TEXT DEFAULT 'Processing',
+                order_status TEXT DEFAULT 'Confirmed',
                 payment_status TEXT DEFAULT 'Paid',
                 delivery_status TEXT DEFAULT 'Processing',
                 courier_name TEXT DEFAULT 'Standard Express',
@@ -227,9 +268,27 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 customer_id INTEGER,
                 customer_name TEXT,
+                product_id TEXT,
                 book_id TEXT,
-                rating INTEGER,
+                rating INTEGER DEFAULT 5,
+                review_title TEXT,
                 review_text TEXT,
+                status TEXT DEFAULT 'Approved',
+                is_verified_purchase INTEGER DEFAULT 0,
+                helpful_count INTEGER DEFAULT 0,
+                report_count INTEGER DEFAULT 0,
+                is_featured INTEGER DEFAULT 0,
+                admin_reply TEXT,
+                reply_date TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS review_reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                review_id INTEGER,
+                reason TEXT,
+                reporter_id INTEGER,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -281,17 +340,172 @@ def init_db():
             )
         ''')
         conn.execute('''
+            CREATE TABLE IF NOT EXISTS shipping_addresses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER,
+                full_name TEXT,
+                phone TEXT,
+                address_line1 TEXT,
+                address_line2 TEXT,
+                city TEXT,
+                state TEXT,
+                country TEXT,
+                postal_code TEXT,
+                address_type TEXT DEFAULT 'Home',
+                is_default INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS shipment_tracking (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                order_id INTEGER,
+                tracking_number TEXT,
+                courier_name TEXT,
+                shipment_status TEXT DEFAULT 'Processing',
+                current_location TEXT DEFAULT 'Warehouse',
+                estimated_delivery TEXT,
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS tracking_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tracking_id INTEGER,
+                status TEXT,
+                location TEXT,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS authors (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                bio TEXT,
+                image TEXT
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS publishers (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                bio TEXT,
+                logo TEXT
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS genres (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS discounts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                discount_type TEXT DEFAULT 'percentage',
+                amount REAL DEFAULT 0,
+                status INTEGER DEFAULT 1
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS story_email_settings (
+                id INTEGER PRIMARY KEY,
+                smtp_host TEXT DEFAULT 'smtp.gmail.com',
+                smtp_port INTEGER DEFAULT 587,
+                sender_email TEXT DEFAULT 'store@akclicks.com',
+                sender_name TEXT DEFAULT 'AK Story Store',
+                app_password TEXT DEFAULT '',
+                is_enabled INTEGER DEFAULT 0
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS story_settings (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS otp_codes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                identifier TEXT,
+                otp_hash TEXT,
+                expires_at TEXT,
+                is_used INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS failed_logins (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ip_address TEXT,
+                attempt_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
             CREATE TABLE IF NOT EXISTS story_admin_security (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 max_login_attempts INTEGER DEFAULT 5,
-                auto_logout_minutes INTEGER DEFAULT 20
+                auto_logout_minutes INTEGER DEFAULT 20,
+                is_2fa_enabled INTEGER DEFAULT 0,
+                secret_key TEXT,
+                security_score INTEGER DEFAULT 85,
+                ip_restriction_enabled INTEGER DEFAULT 0,
+                allowed_ips TEXT DEFAULT '127.0.0.1, ::1',
+                session_timeout_minutes INTEGER DEFAULT 30,
+                ssl_enforced INTEGER DEFAULT 1
             )
         ''')
         conn.execute('''
             CREATE TABLE IF NOT EXISTS story_admin_audit_logs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                admin_name TEXT DEFAULT 'Admin',
                 action TEXT,
                 module TEXT,
+                status TEXT DEFAULT 'SUCCESS',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS story_admin_recovery_codes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code_hash TEXT,
+                code_plain TEXT,
+                is_used INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS story_admin_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                admin_user TEXT,
+                ip_address TEXT,
+                user_agent TEXT,
+                last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS audit_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                actor TEXT,
+                action_type TEXT,
+                affected_table TEXT,
+                record_id TEXT,
+                old_value TEXT,
+                new_value TEXT,
+                ip_address TEXT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS security_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                event_type TEXT,
+                description TEXT,
+                severity TEXT DEFAULT 'INFO',
+                ip_address TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -308,17 +522,35 @@ def init_db():
             )
         ''')
 
-        # Add discount_price column safely if missing
-        try:
-            conn.execute("ALTER TABLE products ADD COLUMN discount_price REAL DEFAULT 0")
-        except sqlite3.OperationalError:
-            pass
-
-        # Add user_id column safely if missing
-        try:
-            conn.execute("ALTER TABLE story_notifications ADD COLUMN user_id INTEGER DEFAULT 0")
-        except sqlite3.OperationalError:
-            pass
+        # Add missing columns safely if existing tables were created with older schemas
+        cols_to_add = [
+            ("products", "discount_price REAL DEFAULT 0"),
+            ("story_notifications", "user_id INTEGER DEFAULT 0"),
+            ("orders", "order_status TEXT DEFAULT 'Confirmed'"),
+            ("reviews", "product_id TEXT"),
+            ("reviews", "review_title TEXT"),
+            ("reviews", "status TEXT DEFAULT 'Approved'"),
+            ("reviews", "is_verified_purchase INTEGER DEFAULT 0"),
+            ("reviews", "helpful_count INTEGER DEFAULT 0"),
+            ("reviews", "report_count INTEGER DEFAULT 0"),
+            ("reviews", "is_featured INTEGER DEFAULT 0"),
+            ("reviews", "admin_reply TEXT"),
+            ("reviews", "reply_date TEXT"),
+            ("story_admin_security", "is_2fa_enabled INTEGER DEFAULT 0"),
+            ("story_admin_security", "secret_key TEXT"),
+            ("story_admin_security", "security_score INTEGER DEFAULT 85"),
+            ("story_admin_security", "ip_restriction_enabled INTEGER DEFAULT 0"),
+            ("story_admin_security", "allowed_ips TEXT DEFAULT '127.0.0.1, ::1'"),
+            ("story_admin_security", "session_timeout_minutes INTEGER DEFAULT 30"),
+            ("story_admin_security", "ssl_enforced INTEGER DEFAULT 1"),
+            ("story_admin_audit_logs", "admin_name TEXT DEFAULT 'Admin'"),
+            ("story_admin_audit_logs", "status TEXT DEFAULT 'SUCCESS'")
+        ]
+        for tbl, col_def in cols_to_add:
+            try:
+                conn.execute(f"ALTER TABLE {tbl} ADD COLUMN {col_def}")
+            except sqlite3.OperationalError:
+                pass
 
         # Seed categories
         init_cats = [
@@ -348,7 +580,10 @@ def init_db():
         # Insert security defaults if empty
         sec_count = conn.execute("SELECT COUNT(*) as count FROM story_admin_security").fetchone()["count"]
         if sec_count == 0:
-            conn.execute("INSERT INTO story_admin_security (max_login_attempts, auto_logout_minutes) VALUES (5, 20)")
+            conn.execute("INSERT INTO story_admin_security (max_login_attempts, auto_logout_minutes, is_2fa_enabled, security_score) VALUES (5, 20, 0, 85)")
+
+        # Insert email settings defaults if empty
+        conn.execute("INSERT OR IGNORE INTO story_email_settings (id, smtp_host, smtp_port, sender_email, sender_name, app_password, is_enabled) VALUES (1, 'smtp.gmail.com', 587, 'store@akclicks.com', 'AK Story Store', '', 0)")
 
 def get_story_book(book_id):
     str_id = str(book_id).strip()
@@ -367,7 +602,7 @@ def get_story_book(book_id):
     return None
 
 def get_cart_items():
-    cart = session.get("cart", {})
+    cart = session.get("story_cart") or session.get("cart", {})
     items = []
     subtotal = 0
     if isinstance(cart, dict):
@@ -389,7 +624,7 @@ def get_cart_items():
     return items, subtotal
 
 def get_wishlist_ids():
-    cust_id = session.get("customer_id")
+    cust_id = session.get("story_customer_id")
     if cust_id:
         with db_connection() as conn:
             rows = conn.execute("SELECT book_id FROM wishlist WHERE customer_id=?", (cust_id,)).fetchall()
@@ -401,6 +636,7 @@ def get_wishlist_count():
     return len(get_wishlist_ids())
 
 @app.route("/", endpoint="home")
+@app.route("/index", endpoint="index")
 @app.route("/shop", endpoint="shop")
 @app.route("/story-store")
 def story_home():
@@ -408,7 +644,7 @@ def story_home():
     cart_items, _ = get_cart_items()
     cart_count = sum(item["quantity"] for item in cart_items)
     wishlist_ids = get_wishlist_ids()
-    customer_id = session.get("customer_id", 1)
+    customer_id = session.get("story_customer_id", 1)
     with db_connection() as conn:
         bestsellers = [dict(r) for r in conn.execute("SELECT * FROM products WHERE is_bestseller=1 LIMIT 4").fetchall()]
         trending = [dict(r) for r in conn.execute("SELECT * FROM products WHERE is_trending=1 OR rating >= 4.5 ORDER BY rating DESC LIMIT 6").fetchall()]
@@ -655,8 +891,8 @@ def story_buy_now(book_id):
         pass
 
     session["pending_story_order"] = {
-        "customer_name": session.get("customer_name", "Valued Customer"),
-        "email": session.get("email", "customer@example.com"),
+        "customer_name": session.get("story_customer_name", "Valued Customer"),
+        "email": session.get("story_email", "customer@example.com"),
         "phone": "9876543210",
         "address": "Coimbatore, Tamil Nadu",
         "items": f"{book['name']} x {qty}",
@@ -840,8 +1076,9 @@ def story_payment():
     cart_items, subtotal = get_cart_items()
     order = session.get("pending_story_order")
     if not order and cart_items:
+        customer_name = session.get("story_customer_name") or session.get("customer_name", "Guest Customer")
         order = {
-            "customer_name": session.get("customer_name", "Guest Customer"),
+            "customer_name": customer_name,
             "email": "customer@example.com",
             "phone": "9876543210",
             "address": "Coimbatore, Tamil Nadu",
@@ -855,12 +1092,17 @@ def story_payment():
     if request.method == "POST":
         return redirect(url_for("story_order_success"))
 
+    configured_upi = app.config.get("UPI_ID") or os.environ.get("UPI_ID") or globals().get("UPI_ID")
+    if not configured_upi:
+        configured_upi = "payments@akclicks"
+        flash("UPI ID configuration missing. Using fallback merchant ID.", "warning")
+
     return render_template(
         "story_payment.html",
         order=order,
         cart_items=cart_items,
         amount=order.get("total", subtotal),
-        upi_id=UPI_ID,
+        upi_id=configured_upi,
         cart_count=sum(i["quantity"] for i in cart_items)
     )
 
@@ -869,8 +1111,9 @@ def story_order_success():
     order_info = session.pop("pending_story_order", None)
     cart_items, subtotal = get_cart_items()
     if not order_info and cart_items:
+        customer_name = session.get("story_customer_name") or session.get("customer_name", "Guest Customer")
         order_info = {
-            "customer_name": session.get("customer_name", "Guest Customer"),
+            "customer_name": customer_name,
             "email": "customer@example.com",
             "phone": "9876543210",
             "address": "Coimbatore, Tamil Nadu",
@@ -880,7 +1123,7 @@ def story_order_success():
     
     order_id = None
     if order_info:
-        customer_id = session.get("customer_id")
+        customer_id = session.get("story_customer_id") or session.get("customer_id")
         payment_method = request.form.get("method", "Razorpay / UPI")
         with db_connection() as conn:
             cur = conn.execute(
@@ -889,7 +1132,7 @@ def story_order_success():
             )
             order_id = cur.lastrowid
             subject = f"Order Confirmation - AK CLICKS Story Store (#ORD-{order_id})"
-            body = f"Hello {order_info['customer_name']},\n\nThank you for your order!\n\nOrder ID: ORD-{order_id}\nItems: {order_info['items']}\nTotal: Γé╣{order_info['total']}\n\nWe will ship your books shortly."
+            body = f"Hello {order_info['customer_name']},\n\nThank you for your order!\n\nOrder ID: ORD-{order_id}\nItems: {order_info['items']}\nTotal: ₹{order_info['total']}\n\nWe will ship your books shortly."
             queue_notification(conn, order_info["email"], "email", subject, body)
 
     # Generate synthetic IDs & delivery date
@@ -914,6 +1157,7 @@ def story_order_success():
         "payment_method": request.form.get("method", "Razorpay / UPI")
     }
 
+    session.pop("story_cart", None)
     session.pop("cart", None)
     session.modified = True
 
@@ -921,7 +1165,17 @@ def story_order_success():
 
 @app.route("/story-store/payment/qr")
 def story_payment_qr():
-    img = qrcode.make("upi://pay?pa=payments@akclicks&pn=AK%20STORY%20STORE&cu=INR")
+    upi_id = app.config.get("UPI_ID") or os.environ.get("UPI_ID") or globals().get("UPI_ID", "payments@akclicks")
+    amount = request.args.get("amount", "").strip()
+    upi_url = f"upi://pay?pa={upi_id}&pn=AK%20STORY%20STORE&cu=INR"
+    if amount:
+        try:
+            amt_val = float(amount)
+            if amt_val > 0:
+                upi_url += f"&am={amt_val:.2f}"
+        except ValueError:
+            pass
+    img = qrcode.make(upi_url)
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     buf.seek(0)
@@ -1176,6 +1430,7 @@ def story_customer_forgot_password():
 # ================= Story Store Customer Dashboard Module =================
 
 @app.route("/story-store/dashboard")
+@app.route("/story-store/customer/orders", endpoint="customer_orders")
 def story_customer_dashboard():
     if not session.get("story_customer_id"):
         return redirect(url_for("story_customer_login"))
@@ -2973,19 +3228,6 @@ def verify_totp_token(secret, token):
             return True
     return False
 
-def log_admin_audit_action(action, module="SECURITY", admin_name="Admin", status="SUCCESS", conn=None):
-    if conn is not None:
-        conn.execute("""
-            INSERT INTO story_admin_audit_logs (admin_name, action, module, status)
-            VALUES (?, ?, ?, ?)
-        """, (admin_name, action, module, status))
-    else:
-        with db_connection() as new_conn:
-            new_conn.execute("""
-                INSERT INTO story_admin_audit_logs (admin_name, action, module, status)
-                VALUES (?, ?, ?, ?)
-            """, (admin_name, action, module, status))
-
 @app.route("/story-store/admin/2fa/verify", methods=["GET", "POST"])
 def story_admin_2fa_verify():
     if not session.get("story_admin_pending"):
@@ -3184,4 +3426,8 @@ with app.app_context():
     init_db()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5001)))
+    app.run(
+        host="0.0.0.0",
+        port=5001,
+        debug=True
+    )
