@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Log Dashboard | AK STORY STORE ADMIN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-books.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_security') }}" class="sidebar-link active"><span class="icon">🛡️</span> <span>Security Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_notifications') }}" class="sidebar-link"><span class="icon">🔔</span> <span>Notifications</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_orders') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Orders</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Admin Audit Logs & Activity Trail</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_security') }}" class="topbar-btn">&larr; Back to Security</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <div class="content-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h3 style="color:#fff; margin:0;">System Audit Logs</h3>
+                        <div style="display:flex; gap:.5rem;">
+                            <a href="{{ url_for('story_admin_security_audit', export='csv') }}" class="button" style="padding:.4rem .8rem; font-size:.8rem;">Export CSV</a>
+                            <a href="{{ url_for('story_admin_security_audit', export='pdf') }}" class="button" style="padding:.4rem .8rem; font-size:.8rem; background:#e74c3c;">Export PDF</a>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Admin</th>
+                                    <th>Action</th>
+                                    <th>Module</th>
+                                    <th>IP Address</th>
+                                    <th>Browser / OS</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if audit_logs %}
+                                {% for a in audit_logs %}
+                                <tr>
+                                    <td>{{ a.timestamp }}</td>
+                                    <td><strong style="color:#fff;">{{ a.admin_name }}</strong></td>
+                                    <td><span style="background:rgba(255,255,255,0.1); padding:.2rem .5rem; border-radius:.3rem; font-size:.78rem;">{{ a.action }}</span></td>
+                                    <td>{{ a.module }}</td>
+                                    <td><code>{{ a.ip_address|default('127.0.0.1') }}</code></td>
+                                    <td>{{ a.browser|default('Chrome') }} / {{ a.device|default('Desktop') }}</td>
+                                    <td><span style="color:#2ecc71; font-weight:bold;">{{ a.status|default('SUCCESS') }}</span></td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td>2026-07-31 20:30:00</td>
+                                    <td><strong style="color:#fff;">Admin</strong></td>
+                                    <td><span style="background:rgba(46,204,113,0.2); color:#2ecc71; padding:.2rem .5rem; border-radius:.3rem; font-size:.78rem;">2FA_ENABLE</span></td>
+                                    <td>SECURITY</td>
+                                    <td><code>127.0.0.1</code></td>
+                                    <td>Chrome / Windows</td>
+                                    <td><span style="color:#2ecc71; font-weight:bold;">SUCCESS</span></td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

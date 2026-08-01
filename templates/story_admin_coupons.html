@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Coupon Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_categories') }}" class="sidebar-link"><span class="icon">🏷️</span> <span>Categories</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_publishers') }}" class="sidebar-link"><span class="icon">🏢</span> <span>Publishers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_authors') }}" class="sidebar-link"><span class="icon">🖋️</span> <span>Authors</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_genres') }}" class="sidebar-link"><span class="icon">🎭</span> <span>Genres</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_discounts') }}" class="sidebar-link"><span class="icon">🏷️</span> <span>Discounts</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_coupons') }}" class="sidebar-link active"><span class="icon">🎟️</span> <span>Coupons</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_inventory') }}" class="sidebar-link"><span class="icon">📦</span> <span>Inventory</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_orders') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Orders</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_customers') }}" class="sidebar-link"><span class="icon">👥</span> <span>Customers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reports') }}" class="sidebar-link"><span class="icon">📈</span> <span>Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_settings') }}" class="sidebar-link"><span class="icon">⚙️</span> <span>Settings</span></a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout"><span>🚪</span> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Coupon Code System</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:2rem; align-items:start;">
+                    <!-- Add Coupon Form -->
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1.25rem;">Create New Coupon</h3>
+                        <form action="{{ url_for('story_admin_coupons') }}" method="post">
+                            <div style="margin-bottom:1rem;">
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Coupon Code *</label>
+                                <input type="text" name="code" placeholder="e.g. READ20" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem; text-transform:uppercase;">
+                            </div>
+                            <div style="margin-bottom:1rem;">
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Discount Type *</label>
+                                <select name="discount_type" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                                    <option value="percentage">Percentage Off (%)</option>
+                                    <option value="fixed">Fixed Amount Off (₹)</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom:1rem;">
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Discount Value *</label>
+                                <input type="number" name="amount" min="1" placeholder="20" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div style="margin-bottom:1rem;">
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Minimum Order Amount (₹)</label>
+                                <input type="number" name="min_order" min="0" placeholder="499" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div style="margin-bottom:1.5rem;">
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Usage Limit</label>
+                                <input type="number" name="usage_limit" min="1" placeholder="100" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <button type="submit" class="topbar-btn" style="background:var(--first-color); width:100%; text-align:center; padding:.75rem;">Create Coupon</button>
+                        </form>
+                    </div>
+
+                    <!-- Coupons Table -->
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1.25rem;">Active Coupons ({{ coupons|length }})</h3>
+                        <div style="overflow-x:auto;">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Discount</th>
+                                        <th>Min Order</th>
+                                        <th>Usage</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if coupons %}
+                                    {% for c in coupons %}
+                                    <tr>
+                                        <td><strong style="color:var(--first-color); font-family:monospace; font-size:1.1rem;">{{ c.code }}</strong></td>
+                                        <td>{% if c.discount_type == 'percentage' %}{{ c.amount }}% OFF{% else %}₹{{ c.amount }} OFF{% endif %}</td>
+                                        <td>₹{{ c.min_order }}</td>
+                                        <td>{{ c.used_count }} / {{ c.usage_limit }}</td>
+                                        <td>
+                                            {% if c.status %}
+                                            <span style="color:#2ecc71; font-weight:600;">Active</span>
+                                            {% else %}
+                                            <span style="color:#e74c3c;">Disabled</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <form action="{{ url_for('story_admin_coupon_toggle', coupon_id=c.id) }}" method="post">
+                                                <button type="submit" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid var(--card-border); padding:.3rem .6rem; border-radius:.3rem; font-size:.8rem; cursor:pointer;">Toggle</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">No coupons created yet.</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

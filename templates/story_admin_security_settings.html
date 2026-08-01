@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Settings & Policies | AK STORY STORE ADMIN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-books.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_security') }}" class="sidebar-link active"><span class="icon">🛡️</span> <span>Security Dashboard</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Security Policies & System Hardening Settings</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_security') }}" class="topbar-btn">&larr; Back to Security</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="content-card" style="max-width:680px;">
+                    <h3 style="color:#fff; margin:0 0 1.25rem;">Global Admin Security Policies</h3>
+
+                    <form action="{{ url_for('story_admin_security_settings') }}" method="post" style="display:grid; gap:1.25rem;">
+                        <div>
+                            <label style="display:block; color:#fff; font-size:.85rem; margin-bottom:.35rem;">Maximum Login Attempt Threshold</label>
+                            <input type="number" name="max_login_attempts" value="{{ sec.max_login_attempts|default(5) }}" min="3" max="10" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.6); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            <span style="font-size:.78rem; color:var(--text-muted);">Number of failed password attempts before account lockout (Default: 5 attempts).</span>
+                        </div>
+
+                        <div>
+                            <label style="display:block; color:#fff; font-size:.85rem; margin-bottom:.35rem;">Inactivity Auto-Logout Timeout (Minutes)</label>
+                            <input type="number" name="auto_logout_minutes" value="{{ sec.auto_logout_minutes|default(20) }}" min="5" max="120" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.6); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            <span style="font-size:.78rem; color:var(--text-muted);">Admin session automatically terminates after specified inactivity period (Default: 20 minutes).</span>
+                        </div>
+
+                        <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); padding:1rem; border-radius:.5rem; display:grid; gap:.75rem;">
+                            <label style="display:flex; align-items:center; gap:.75rem; color:#fff; font-size:.88rem; cursor:pointer;">
+                                <input type="checkbox" name="require_strong_passwords" checked style="accent-color:var(--first-color);">
+                                Require Strong Passwords (8+ characters with uppercase & numbers)
+                            </label>
+                            <label style="display:flex; align-items:center; gap:.75rem; color:#fff; font-size:.88rem; cursor:pointer;">
+                                <input type="checkbox" name="enable_audit_logging" checked style="accent-color:var(--first-color);">
+                                Enable Real-time System Audit Logging
+                            </label>
+                            <label style="display:flex; align-items:center; gap:.75rem; color:#fff; font-size:.88rem; cursor:pointer;">
+                                <input type="checkbox" name="login_email_alerts" checked style="accent-color:var(--first-color);">
+                                Send Email Alerts on New Device Logins
+                            </label>
+                        </div>
+
+                        <button type="submit" class="button" style="padding:.75rem; font-weight:bold;">Save Security Policies &rarr;</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

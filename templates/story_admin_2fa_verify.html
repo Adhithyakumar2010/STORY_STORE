@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin 2FA Verification | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-login.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="story-admin-login-body" style="background:#161713; color:#fff; display:flex; justify-content:center; align-items:center; min-height:100vh; font-family:'Poppins',sans-serif;">
+
+    <div style="background:rgba(30,31,26,0.95); border:1px solid rgba(255,255,255,0.1); border-radius:1.25rem; padding:2.5rem; width:100%; max-width:420px; box-shadow:0 15px 35px rgba(0,0,0,0.5); text-align:center;">
+        <div style="font-size:2.8rem; margin-bottom:.5rem;">🛡️</div>
+        <h2 style="color:#fff; margin:0 0 .5rem; font-size:1.5rem;">Admin 2FA Required</h2>
+        <p style="color:var(--text-muted, #aaa); font-size:.88rem; margin-bottom:1.5rem;">Enter the 6-digit TOTP code from your Google/Microsoft Authenticator app or a single-use recovery code.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="margin-bottom:1.25rem;">
+            {% for category, message in messages %}
+            <div style="background:rgba(231,76,60,0.15); border:1px solid #e74c3c; color:#e74c3c; padding:.65rem 1rem; border-radius:.5rem; font-size:.85rem;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('story_admin_2fa_verify') }}" method="post" style="display:grid; gap:1.25rem;">
+            <div>
+                <input type="text" name="totp_code" placeholder="• • • • • •" required autofocus style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.15); color:#ff4820; padding:.85rem 1rem; border-radius:.6rem; text-align:center; font-size:1.5rem; font-weight:800; letter-spacing:4px;">
+            </div>
+            <button type="submit" style="background:#ff4820; color:#fff; border:none; padding:.85rem; border-radius:.5rem; font-weight:bold; font-size:1rem; cursor:pointer;">Authenticate & Open Dashboard &rarr;</button>
+        </form>
+
+        <div style="margin-top:1.5rem; font-size:.8rem; color:#aaa;">
+            <a href="{{ url_for('story_admin_login') }}" style="color:#ff4820; text-decoration:none;">Cancel Login</a>
+        </div>
+    </div>
+
+</body>
+</html>

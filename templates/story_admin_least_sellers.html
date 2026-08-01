@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Least Selling Books</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-books.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_analytics') }}" class="sidebar-link"><span class="icon">📈</span> <span>Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_best_sellers') }}" class="sidebar-link"><span class="icon">⭐</span> <span>Best Sellers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_least_sellers') }}" class="sidebar-link active"><span class="icon">📉</span> <span>Least Sellers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_categories') }}" class="sidebar-link"><span class="icon">🏷️</span> <span>Categories</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_publishers') }}" class="sidebar-link"><span class="icon">🏢</span> <span>Publishers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_authors') }}" class="sidebar-link"><span class="icon">🖋️</span> <span>Authors</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_genres') }}" class="sidebar-link"><span class="icon">🎭</span> <span>Genres</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_coupons') }}" class="sidebar-link"><span class="icon">🎟️</span> <span>Coupons</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_inventory') }}" class="sidebar-link"><span class="icon">📦</span> <span>Inventory</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_orders') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Orders</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_customers') }}" class="sidebar-link"><span class="icon">👥</span> <span>Customers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reports_monthly') }}" class="sidebar-link"><span class="icon">📅</span> <span>Monthly Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reports_yearly') }}" class="sidebar-link"><span class="icon">📊</span> <span>Yearly Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_revenue') }}" class="sidebar-link"><span class="icon">💰</span> <span>Revenue Stats</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_customer_analytics') }}" class="sidebar-link"><span class="icon">👤</span> <span>Customer Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_export_center') }}" class="sidebar-link"><span class="icon">📥</span> <span>Export Center</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_settings') }}" class="sidebar-link"><span class="icon">⚙️</span> <span>Settings</span></a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout"><span>🚪</span> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Least Selling Books & Inventory Recommendations</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <div class="content-card">
+                    <h3 style="color:#fff; margin:0 0 1.25rem;">Slow Moving Catalog Items</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Cover</th>
+                                    <th>Book Title</th>
+                                    <th>Author</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                    <th>Price</th>
+                                    <th>Promotion Recommendation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if least_books %}
+                                {% for b in least_books %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ url_for('static', filename=b.image) }}" alt="{{ b.name }}" class="book-thumb">
+                                    </td>
+                                    <td><strong style="color:#fff;">{{ b.name }}</strong></td>
+                                    <td>{{ b.author|default('N/A') }}</td>
+                                    <td><span style="background:rgba(255,72,32,0.15); color:var(--first-color); padding:.15rem .4rem; border-radius:.25rem; font-size:.75rem;">{{ b.category }}</span></td>
+                                    <td><strong>{{ b.stock }}</strong></td>
+                                    <td>₹{{ b.price }}</td>
+                                    <td>
+                                        {% if loop.index == 1 %}
+                                        <span style="background:rgba(230,126,34,0.2); color:#e67e22; border:1px solid #e67e22; padding:.2rem .6rem; border-radius:.3rem; font-size:.75rem; font-weight:bold;">📢 Promote & Feature</span>
+                                        {% elif loop.index == 2 %}
+                                        <span style="background:rgba(241,196,15,0.2); color:#f1c40f; border:1px solid #f1c40f; padding:.2rem .6rem; border-radius:.3rem; font-size:.75rem; font-weight:bold;">🏷️ Discount Suggested</span>
+                                        {% else %}
+                                        <span style="background:rgba(149,165,166,0.2); color:#95a5a6; border:1px solid #95a5a6; padding:.2rem .6rem; border-radius:.3rem; font-size:.75rem; font-weight:bold;">📦 Restock Not Required</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" style="text-align:center; padding:2.5rem; color:var(--text-muted);">No slow moving items detected.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

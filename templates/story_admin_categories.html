@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Categories</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link">
+                        <span class="icon">📊</span> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_books') }}" class="sidebar-link">
+                        <span class="icon">📚</span> <span>Books Catalog</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_categories') }}" class="sidebar-link active">
+                        <span class="icon">🏷️</span> <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_orders') }}" class="sidebar-link">
+                        <span class="icon">📦</span> <span>Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_customers') }}" class="sidebar-link">
+                        <span class="icon">👥</span> <span>Customers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_reports') }}" class="sidebar-link">
+                        <span class="icon">📈</span> <span>Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_settings') }}" class="sidebar-link">
+                        <span class="icon">⚙️</span> <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Category Management</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:2rem; align-items:start;">
+                    <!-- Add Category Form -->
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1.25rem;">Add New Category</h3>
+                        <form action="{{ url_for('story_admin_categories') }}" method="post" enctype="multipart/form-data">
+                            <div style="margin-bottom:1rem;">
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Category Name *</label>
+                                <input type="text" name="name" placeholder="e.g. Mystery & Thriller" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+
+                            <div style="margin-bottom:1rem;">
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Description</label>
+                                <textarea name="description" rows="3" placeholder="Category summary..." style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;"></textarea>
+                            </div>
+
+                            <div style="margin-bottom:1.5rem;">
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Category Image</label>
+                                <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" style="color:#fff;">
+                            </div>
+
+                            <button type="submit" class="topbar-btn" style="background:var(--first-color); width:100%; text-align:center; padding:.75rem;">Add Category</button>
+                        </form>
+                    </div>
+
+                    <!-- Categories List -->
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1.25rem;">Existing Categories ({{ categories|length }})</h3>
+                        <div style="overflow-x:auto;">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Category Name</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if categories %}
+                                    {% for cat in categories %}
+                                    <tr>
+                                        <td>
+                                            <img src="{{ url_for('static', filename=cat.image|default('images/story-store/category1-img.jpg')) }}" alt="{{ cat.name }}" style="width:50px; height:50px; object-fit:cover; border-radius:.4rem;">
+                                        </td>
+                                        <td>
+                                            <strong style="color:#fff;">{{ cat.name }}</strong>
+                                        </td>
+                                        <td>
+                                            <span style="font-size:.85rem; color:var(--text-muted);">{{ cat.description|default('No description.') }}</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" style="text-align:center; padding:2rem; color:var(--text-muted);">No categories added yet.</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

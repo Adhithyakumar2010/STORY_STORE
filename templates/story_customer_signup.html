@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Signup | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="story-store-body" style="background-color: #161713; color: #fff; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+
+    <div style="background: rgba(30, 31, 26, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; padding: 2.5rem; width: 100%; max-width: 440px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: .5rem;">✨</div>
+        <h2 style="color: #fff; margin: 0 0 .5rem; font-size: 1.6rem; font-weight: 700;">Join AK Story Store</h2>
+        <p style="color: var(--text-color-light, #aaa); font-size: .88rem; margin-bottom: 1.75rem;">Create your Story Store account to explore, read, and save your favorite books.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="margin-bottom: 1.25rem;">
+            {% for category, message in messages %}
+            <div style="background: rgba(231,76,60,0.15); border: 1px solid #e74c3c; color: #e74c3c; padding: .65rem 1rem; border-radius: .5rem; font-size: .85rem;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('story_customer_signup') }}" method="post" style="display: grid; gap: 1.25rem; text-align: left;">
+            <div>
+                <label style="display: block; font-size: .85rem; color: #fff; margin-bottom: .35rem;">Full Name *</label>
+                <input type="text" name="name" placeholder="John Doe" required style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1px solid var(--card-border, rgba(255,255,255,0.15)); color: #fff; padding: .75rem 1rem; border-radius: .6rem; font-size: .95rem;">
+            </div>
+
+            <div>
+                <label style="display: block; font-size: .85rem; color: #fff; margin-bottom: .35rem;">Email Address *</label>
+                <input type="email" name="email" placeholder="you@example.com" required style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1px solid var(--card-border, rgba(255,255,255,0.15)); color: #fff; padding: .75rem 1rem; border-radius: .6rem; font-size: .95rem;">
+            </div>
+
+            <div>
+                <label style="display: block; font-size: .85rem; color: #fff; margin-bottom: .35rem;">Password *</label>
+                <input type="password" name="password" placeholder="••••••••" required minlength="6" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.6); border: 1px solid var(--card-border, rgba(255,255,255,0.15)); color: #fff; padding: .75rem 1rem; border-radius: .6rem; font-size: .95rem;">
+            </div>
+
+            <button type="submit" class="button" style="width: 100%; padding: .85rem; font-weight: bold; margin-top: .5rem;">Create Story Account &rarr;</button>
+        </form>
+
+        <div style="margin-top: 1.75rem; font-size: .85rem; color: var(--text-color-light, #aaa);">
+            Already have a Story Store account? <a href="{{ url_for('story_customer_login') }}" style="color: var(--first-color, #ff4820); text-decoration: none; font-weight: bold;">Log In</a>
+        </div>
+        <div style="margin-top: 1rem; font-size: .8rem;">
+            <a href="{{ url_for('story_home') }}" style="color: #aaa; text-decoration: none;">&larr; Back to Story Store</a>
+        </div>
+    </div>
+
+</body>
+</html>

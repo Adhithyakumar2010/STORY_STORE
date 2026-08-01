@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Shipping Addresses | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="story-store-body" style="background-color: #161713; color: #fff; min-height: 100vh; display: flex; flex-direction: column;">
+
+    {% set active_page = 'addresses' %}
+    {% include 'story_header.html' %}
+
+    <main class="main section container" style="flex: 1; padding-top: 5.5rem; padding-bottom: 4rem;">
+        <div style="margin-bottom: 2.5rem; text-align: center;">
+            <h1 class="section__title" style="margin-bottom: .5rem; font-size: 2rem;">Saved Delivery Addresses</h1>
+            <p style="color: var(--text-color-light); font-size: .95rem; max-width: 600px; margin: 0 auto;">
+                Manage your home, office, and default shipping addresses for fast checkout & courier tracking.
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="max-width: 850px; margin: 0 auto 2rem;">
+            {% for category, message in messages %}
+            <div style="background: rgba(46,204,113,0.15); border: 1px solid #2ecc71; color: #2ecc71; padding: .85rem 1.25rem; border-radius: .75rem; font-size: .9rem;">
+                ✓ {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div style="max-width: 850px; margin: 0 auto; display: grid; gap: 2rem;">
+            <!-- Add New Address Form -->
+            <div style="background: rgba(30, 31, 26, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; padding: 1.75rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+                <h3 style="color: #fff; margin: 0 0 1.25rem; font-size: 1.2rem;">+ Add New Shipping Address</h3>
+                <form action="{{ url_for('story_address_add') }}" method="post" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                    <div>
+                        <label style="display: block; color: #fff; font-size: .85rem; margin-bottom: .35rem;">Full Name *</label>
+                        <input type="text" name="full_name" placeholder="John Doe" required style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; padding: .75rem 1rem; border-radius: .5rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: #fff; font-size: .85rem; margin-bottom: .35rem;">Phone Number *</label>
+                        <input type="tel" name="phone" placeholder="9876543210" required style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; padding: .75rem 1rem; border-radius: .5rem;">
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label style="display: block; color: #fff; font-size: .85rem; margin-bottom: .35rem;">Address Line 1 *</label>
+                        <input type="text" name="address_line1" placeholder="House/Flat No, Street Name" required style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; padding: .75rem 1rem; border-radius: .5rem;">
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label style="display: block; color: #fff; font-size: .85rem; margin-bottom: .35rem;">Address Line 2 (Optional)</label>
+                        <input type="text" name="address_line2" placeholder="Landmark, Area" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; padding: .75rem 1rem; border-radius: .5rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: #fff; font-size: .85rem; margin-bottom: .35rem;">City *</label>
+                        <input type="text" name="city" placeholder="Chennai" required style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; padding: .75rem 1rem; border-radius: .5rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: #fff; font-size: .85rem; margin-bottom: .35rem;">State *</label>
+                        <input type="text" name="state" placeholder="Tamil Nadu" required style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; padding: .75rem 1rem; border-radius: .5rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: #fff; font-size: .85rem; margin-bottom: .35rem;">Postal Code (PIN) *</label>
+                        <input type="text" name="postal_code" placeholder="600001" required style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; padding: .75rem 1rem; border-radius: .5rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: #fff; font-size: .85rem; margin-bottom: .35rem;">Address Type</label>
+                        <select name="address_type" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid var(--card-border); color: #fff; padding: .75rem 1rem; border-radius: .5rem;">
+                            <option value="Home">Home</option>
+                            <option value="Office">Office</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div style="grid-column: span 2; display: flex; align-items: center; gap: .5rem; margin-top: .5rem;">
+                        <input type="checkbox" name="is_default" id="chk_default" value="1">
+                        <label for="chk_default" style="font-size: .88rem; color: #fff; cursor: pointer;">Set as Default Shipping Address</label>
+                    </div>
+                    <div style="grid-column: span 2; margin-top: .5rem;">
+                        <button type="submit" class="button">Save Address &rarr;</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Address Cards Grid -->
+            <div style="display: grid; gap: 1.25rem;">
+                <h3 style="color: #fff; margin: 0;">Your Saved Addresses ({{ addresses|length }})</h3>
+                {% if addresses %}
+                {% for a in addresses %}
+                <div style="background: rgba(30, 31, 26, 0.95); border: 1px solid {% if a.is_default %}#2ecc71{% else %}rgba(255,255,255,0.1){% endif %}; border-radius: 1rem; padding: 1.5rem; display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: .6rem; margin-bottom: .4rem;">
+                            <strong style="color: #fff; font-size: 1.1rem;">{{ a.full_name }}</strong>
+                            <span style="background: rgba(255,255,255,0.1); color: #fff; padding: .15rem .5rem; border-radius: .4rem; font-size: .75rem;">{{ a.address_type }}</span>
+                            {% if a.is_default %}
+                            <span style="background: rgba(46,204,113,0.2); color: #2ecc71; border: 1px solid #2ecc71; padding: .15rem .5rem; border-radius: .4rem; font-size: .75rem; font-weight: 600;">DEFAULT</span>
+                            {% endif %}
+                        </div>
+                        <p style="margin: 0 0 .3rem; color: var(--text-color); font-size: .9rem;">
+                            {{ a.address_line1 }}{% if a.address_line2 %}, {{ a.address_line2 }}{% endif %}
+                        </p>
+                        <p style="margin: 0 0 .5rem; color: var(--text-color-light); font-size: .88rem;">
+                            {{ a.city }}, {{ a.state }} - {{ a.postal_code }} &middot; {{ a.country }}
+                        </p>
+                        <span style="font-size: .85rem; color: var(--first-color);">📞 Phone: {{ a.phone }}</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: .5rem;">
+                        {% if not a.is_default %}
+                        <form action="{{ url_for('story_address_default', address_id=a.id) }}" method="post">
+                            <button type="submit" style="background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); padding: .35rem .75rem; border-radius: .4rem; font-size: .78rem; width: 100%; cursor: pointer;">Make Default</button>
+                        </form>
+                        {% endif %}
+                        <form action="{{ url_for('story_address_delete', address_id=a.id) }}" method="post" onsubmit="return confirm('Delete address?');">
+                            <button type="submit" style="background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); padding: .35rem .75rem; border-radius: .4rem; font-size: .78rem; width: 100%; cursor: pointer;">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="text-align: center; padding: 3rem 1rem; background: rgba(30, 31, 26, 0.95); border-radius: 1rem; color: var(--text-color-light);">
+                    <p>No saved addresses found. Add a shipping address above to enjoy fast checkout!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    {% include 'story_footer.html' %}
+
+</body>
+</html>

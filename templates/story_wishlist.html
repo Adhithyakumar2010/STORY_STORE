@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-cart.css') }}">
+</head>
+<body class="story-store-body">
+
+    {% set active_page = 'wishlist' %}
+    {% include 'story_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main section container">
+        <div style="margin-bottom: 2rem;">
+            <a href="{{ url_for('story_books') }}" class="continue-shopping-link">&larr; Continue Browsing Books</a>
+        </div>
+
+        <h1 class="section__title">My Wishlist</h1>
+
+        {% if books %}
+        <div class="books__container grid">
+            {% for book in books %}
+            <article class="book-card">
+                <span class="book-card__tag">{{ book.category }}</span>
+                <img src="{{ url_for('static', filename=book.image) }}" alt="{{ book.name }}" class="book-card__img">
+                <h3 class="book-card__title">{{ book.name }}</h3>
+                <p class="book-card__author">By {{ book.author|default('AK Authors') }}</p>
+                <div class="book-card__footer">
+                    <span class="book-card__price">₹{{ book.price }}</span>
+                    <div style="display:flex; gap:.5rem;">
+                        <form action="{{ url_for('story_wishlist_move_to_cart', book_id=book.id) }}" method="post" style="margin:0;">
+                            <button type="submit" class="button" style="padding:.4rem .9rem; font-size:.8rem;">Move to Cart</button>
+                        </form>
+                        <button type="button" onclick="toggleWishlist('{{ book.id }}', this);" class="button button--ghost" style="padding:.4rem .7rem; font-size:.85rem; color:#e74c3c;">❤️</button>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-cart-card">
+            <div class="empty-cart-icon">❤️</div>
+            <h2 style="margin-bottom:.5rem;">Your Wishlist is Empty</h2>
+            <p style="color:var(--text-color-light); margin-bottom:2rem;">Save books you love to your wishlist and revisit them anytime.</p>
+            <a href="{{ url_for('story_books') }}" class="button">Explore Books &rarr;</a>
+        </div>
+        {% endif %}
+    </main>
+
+    {% include 'story_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/story-store.js') }}"></script>
+</body>
+</html>

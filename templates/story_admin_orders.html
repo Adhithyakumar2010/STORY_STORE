@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Order Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_analytics') }}" class="sidebar-link"><span class="icon">📈</span> <span>Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_delivery') }}" class="sidebar-link"><span class="icon">🚚</span> <span>Delivery Management</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_categories') }}" class="sidebar-link">
+                        <span class="icon">🏷️</span> <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_orders') }}" class="sidebar-link active">
+                        <span class="icon">📦</span> <span>Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_customers') }}" class="sidebar-link">
+                        <span class="icon">👥</span> <span>Customers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_reports') }}" class="sidebar-link">
+                        <span class="icon">📈</span> <span>Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_settings') }}" class="sidebar-link">
+                        <span class="icon">⚙️</span> <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Story Store Purchase Orders</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="admin-content">
+                <div class="content-card">
+                    <h3 style="color:#fff; margin:0 0 1.25rem;">Order Transactions ({{ orders|length }})</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer Info</th>
+                                    <th>Delivery Address</th>
+                                    <th>Total Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Date</th>
+                                    <th>PDF Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if orders %}
+                                {% for ord in orders %}
+                                <tr>
+                                    <td><strong>ORD-{{ ord.id }}</strong></td>
+                                    <td>
+                                        <strong style="color:#fff;">{{ ord.customer_name }}</strong>
+                                        <div style="font-size:.8rem; color:var(--text-muted);">{{ ord.email }} &middot; {{ ord.phone }}</div>
+                                    </td>
+                                    <td><span style="font-size:.85rem; color:var(--text-muted);">{{ ord.address }}</span></td>
+                                    <td><strong style="color:var(--first-color); font-size:1.1rem;">₹{{ ord.total }}</strong></td>
+                                    <td><span style="background:rgba(46,204,113,0.2); color:#2ecc71; padding:.2rem .5rem; border-radius:.3rem; font-size:.8rem;">{{ ord.payment_method|default('Paid') }}</span></td>
+                                    <td>{{ ord.created_at }}</td>
+                                    <td>
+                                        <a href="{{ url_for('story_download_receipt', order_id=ord.id) }}" class="topbar-btn" style="padding:.3rem .7rem; font-size:.8rem;" target="_blank">📄 Receipt</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" style="text-align:center; padding:3rem; color:var(--text-muted);">No Story Store orders found.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

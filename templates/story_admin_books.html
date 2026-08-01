@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Book Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-books.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_security') }}" class="sidebar-link"><span class="icon">🛡️</span> <span>Security Dashboard</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_2fa_setup') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">🔑</span> <span>2FA Setup</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_security_sessions') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">💻</span> <span>Active Sessions</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_security_audit') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">📜</span> <span>Audit Logs</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_security_password') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">🔐</span> <span>Password Security</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_security_settings') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">⚙️</span> <span>Security Settings</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_analytics') }}" class="sidebar-link"><span class="icon">📈</span> <span>Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_delivery') }}" class="sidebar-link"><span class="icon">🚚</span> <span>Delivery Management</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_flash_sales') }}" class="sidebar-link"><span class="icon">⚡</span> <span>Flash Sales</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_festival_offers') }}" class="sidebar-link"><span class="icon">🎪</span> <span>Festival Offers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_combo_offers') }}" class="sidebar-link"><span class="icon">📦</span> <span>Combo Offers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reviews') }}" class="sidebar-link"><span class="icon">⭐</span> <span>Reviews Moderation</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_review_reports') }}" class="sidebar-link"><span class="icon">🚩</span> <span>Review Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link active"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_categories') }}" class="sidebar-link">
+                        <span class="icon">🏷️</span> <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_orders') }}" class="sidebar-link">
+                        <span class="icon">📦</span> <span>Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_customers') }}" class="sidebar-link">
+                        <span class="icon">👥</span> <span>Customers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_reports') }}" class="sidebar-link">
+                        <span class="icon">📈</span> <span>Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_settings') }}" class="sidebar-link">
+                        <span class="icon">⚙️</span> <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Book Inventory Management</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_book_add') }}" class="topbar-btn" style="background:var(--first-color);">+ Add New Book</a>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <!-- Search & Filters -->
+                <div class="content-card" style="padding:1rem 1.25rem;">
+                    <form action="{{ url_for('story_admin_books') }}" method="get" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+                        <div style="flex:1; min-width:220px;">
+                            <input type="text" name="q" value="{{ active_filters.q|default('') }}" placeholder="Search title, author, ISBN, category..." style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.65rem 1rem; border-radius:.5rem;">
+                        </div>
+
+                        <select name="category" onchange="this.form.submit();" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid var(--card-border); padding:.65rem 1rem; border-radius:.5rem;">
+                            <option value="">All Categories</option>
+                            {% for cat in all_categories %}
+                            <option value="{{ cat }}" {% if active_filters.category == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <select name="stock" onchange="this.form.submit();" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid var(--card-border); padding:.65rem 1rem; border-radius:.5rem;">
+                            <option value="">All Stock Levels</option>
+                            <option value="instock" {% if active_filters.stock == 'instock' %}selected{% endif %}>In Stock (&gt; 5)</option>
+                            <option value="lowstock" {% if active_filters.stock == 'lowstock' %}selected{% endif %}>Low Stock (1-5)</option>
+                            <option value="outstock" {% if active_filters.stock == 'outstock' %}selected{% endif %}>Out of Stock (0)</option>
+                        </select>
+
+                        <button type="submit" class="topbar-btn">Search</button>
+                        <a href="{{ url_for('story_admin_books') }}" class="topbar-btn" style="background:rgba(255,255,255,0.05);">Reset</a>
+                    </form>
+                </div>
+
+                <!-- Book Inventory Table -->
+                <div class="content-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                        <h3 style="margin:0; color:#fff;">All Catalog Books ({{ total_items }})</h3>
+                        <span style="font-size:.85rem; color:var(--text-muted);">Page {{ page }} of {{ total_pages }}</span>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Cover</th>
+                                    <th>Title & Author</th>
+                                    <th>ISBN & Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if books %}
+                                {% for b in books %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ url_for('static', filename=b.image) }}" alt="{{ b.name }}" style="width:45px; height:60px; object-fit:cover; border-radius:.3rem;">
+                                    </td>
+                                    <td>
+                                        <strong style="color:#fff; display:block;">{{ b.name }}</strong>
+                                        <small style="color:var(--text-muted);">By {{ b.author|default('AK Authors') }} &middot; {{ b.publisher|default('AK Pub') }}</small>
+                                    </td>
+                                    <td>
+                                        <div style="font-family:monospace; color:#fff; font-size:.85rem;">{{ b.isbn|default('N/A') }}</div>
+                                        <span style="background:rgba(255,72,32,0.15); color:var(--first-color); padding:.15rem .4rem; border-radius:.25rem; font-size:.7rem; font-weight:600;">{{ b.category }}</span>
+                                    </td>
+                                    <td>
+                                        <strong style="color:var(--first-color);">₹{{ b.price }}</strong>
+                                        {% if b.discount_price > 0 %}
+                                        <small style="display:block; color:var(--text-muted); text-decoration:line-through;">₹{{ b.discount_price }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong style="color:#fff;">{{ b.stock }} units</strong>
+                                        <div>
+                                            {% if b.stock > 5 %}
+                                            <span style="background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid #2ecc71; padding:.1rem .4rem; border-radius:.2rem; font-size:.7rem;">In Stock</span>
+                                            {% elif b.stock > 0 %}
+                                            <span style="background:rgba(243,156,18,0.2); color:#f39c12; border:1px solid #f39c12; padding:.1rem .4rem; border-radius:.2rem; font-size:.7rem;">Low Stock</span>
+                                            {% else %}
+                                            <span style="background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid #e74c3c; padding:.1rem .4rem; border-radius:.2rem; font-size:.7rem;">Out of Stock</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex; gap:.4rem;">
+                                            <a href="{{ url_for('story_admin_book_edit', book_id=b.id) }}" style="background:rgba(243,156,18,0.2); color:#f39c12; border:1px solid #f39c12; padding:.3rem .6rem; border-radius:.3rem; text-decoration:none; font-size:.8rem;">Edit</a>
+                                            <form action="{{ url_for('story_admin_book_delete', book_id=b.id) }}" method="post" onsubmit="return confirm('Delete book \'{{ b.name|escape }}\'?');" style="display:inline;">
+                                                <button type="submit" style="background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid #e74c3c; padding:.3rem .6rem; border-radius:.3rem; font-size:.8rem; cursor:pointer;">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" style="text-align:center; padding:3rem; color:var(--text-muted);">No books found matching search filters.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if total_pages > 1 %}
+                    <div style="display:flex; justify-content:center; gap:.5rem; margin-top:1.5rem;">
+                        {% if page > 1 %}
+                        <a href="{{ url_for('story_admin_books', page=page-1, q=active_filters.q, category=active_filters.category, stock=active_filters.stock) }}" class="topbar-btn">&larr; Prev</a>
+                        {% endif %}
+                        <span style="align-self:center; font-size:.85rem; color:var(--text-muted); padding:0 .5rem;">Page {{ page }} of {{ total_pages }}</span>
+                        {% if page < total_pages %}
+                        <a href="{{ url_for('story_admin_books', page=page+1, q=active_filters.q, category=active_filters.category, stock=active_filters.stock) }}" class="topbar-btn">Next &rarr;</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

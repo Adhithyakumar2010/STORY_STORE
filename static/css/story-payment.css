@@ -1,0 +1,373 @@
+/*=============== STORY PAYMENT PAGE STYLES ===============*/
+.payment-wrapper {
+    padding: 3rem 0;
+}
+
+.payment-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2.5rem;
+}
+
+.payment-card {
+    background: var(--container-color);
+    border: 1px solid var(--card-border);
+    padding: 2.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    margin-bottom: 2rem;
+}
+
+.payment-card:last-child {
+    margin-bottom: 0;
+}
+
+.payment-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.payment-card__title {
+    font-size: var(--h2-font-size);
+    color: var(--title-color);
+}
+
+.customer-info-grid, .address-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    font-size: var(--normal-font-size);
+}
+
+.info-item label {
+    font-size: var(--smaller-font-size);
+    color: var(--text-color-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: .25rem;
+}
+
+.info-item p {
+    color: var(--title-color);
+    font-weight: var(--font-medium);
+}
+
+/* Order Summary Items */
+.summary-item-row {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summary-item-cover {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: .4rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.summary-item-details {
+    flex: 1;
+}
+
+.summary-item-title {
+    font-weight: var(--font-semi-bold);
+    color: var(--title-color);
+    font-size: var(--normal-font-size);
+}
+
+.summary-item-author {
+    font-size: var(--small-font-size);
+    color: var(--text-color-light);
+}
+
+.summary-item-qty {
+    font-size: var(--small-font-size);
+    color: var(--text-color);
+}
+
+.summary-item-price {
+    font-weight: var(--font-black);
+    color: var(--first-color);
+    font-size: 1.1rem;
+}
+
+/* Summary Math Breakdown */
+.summary-math {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--card-border);
+    padding-top: 1rem;
+}
+
+.summary-math-row {
+    display: flex;
+    justify-content: space-between;
+    padding: .5rem 0;
+    font-size: var(--normal-font-size);
+    color: var(--text-color);
+}
+
+.summary-math-row.grand-total {
+    border-top: 2px solid var(--first-color);
+    margin-top: .75rem;
+    padding-top: 1rem;
+    font-size: 1.35rem;
+    font-weight: var(--font-black);
+    color: var(--title-color);
+}
+
+/* Payment Methods Selector */
+.payment-methods-tabs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: .75rem;
+    margin-bottom: 2rem;
+}
+
+.payment-tab {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
+    color: var(--text-color);
+    padding: 1rem .5rem;
+    border-radius: .75rem;
+    text-align: center;
+    font-size: var(--small-font-size);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    transition: .3s;
+}
+
+.payment-tab:hover, .payment-tab.active {
+    background: var(--first-color);
+    color: var(--title-color);
+    border-color: var(--first-color);
+}
+
+.payment-panel-content {
+    display: none;
+}
+
+.payment-panel-content.active {
+    display: block;
+    animation: fadeIn .3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Status Card */
+.status-card {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid #ffc107;
+    color: #ffc107;
+    padding: 1rem 1.25rem;
+    border-radius: .75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+
+.status-badge {
+    background: #ffc107;
+    color: #000;
+    padding: .25rem .6rem;
+    border-radius: 2rem;
+    font-weight: var(--font-black);
+    font-size: var(--smaller-font-size);
+    text-transform: uppercase;
+}
+
+/* Security Badges */
+.secure-badges {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1.25rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: .75rem;
+    border: 1px solid var(--card-border);
+    margin-top: 1.5rem;
+    gap: 1rem;
+}
+
+.badge-item {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: var(--smaller-font-size);
+    color: var(--text-color-light);
+}
+
+/* Real Bank Card Preview Container */
+.card-preview-wrapper {
+    background: linear-gradient(135deg, #2c2520 0%, #1d1b18 55%, #52291d 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-preview-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(255, 72, 32, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.card-preview-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.card-chip {
+    width: 42px;
+    height: 30px;
+    background: linear-gradient(135deg, #d4af37 0%, #f3e5ab 100%);
+    border-radius: 5px;
+    position: relative;
+    border: 1px solid #b89628;
+}
+
+.card-brand-logo {
+    font-weight: var(--font-black);
+    font-size: 1rem;
+    color: var(--first-color);
+    letter-spacing: 1px;
+}
+
+.card-preview-number {
+    font-family: monospace, var(--body-font);
+    font-size: 1.35rem;
+    letter-spacing: 3px;
+    margin-bottom: 1.25rem;
+    color: #ffffff;
+}
+
+.card-preview-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.card-preview-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.card-preview-val {
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Card Brand Selector Logos */
+.card-logos-row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.brand-badge {
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-color-light);
+    transition: all 0.25s;
+}
+
+.brand-badge.active {
+    background: rgba(255, 72, 32, 0.2);
+    border-color: var(--first-color);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 72, 32, 0.3);
+}
+
+/* Inline Input Validation Feedback */
+.input-feedback {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    min-height: 18px;
+    display: block;
+    font-weight: 500;
+}
+
+.input-feedback.valid {
+    color: #2ecc71;
+}
+
+.input-feedback.invalid {
+    color: #e74c3c;
+}
+
+/* Disabled Pay Button Styling */
+button.button:disabled, button.button[disabled] {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Security Badges Below Form */
+.card-security-badges {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-security-badges span {
+    font-size: 0.75rem;
+    color: var(--text-color-light);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.badge-item span {
+    font-size: 1.25rem;
+}
+
+@media(max-width: 850px) {
+    .payment-grid { grid-template-columns: 1fr; }
+    .customer-info-grid, .address-info-grid { grid-template-columns: 1fr; }
+    .secure-badges { flex-direction: column; text-align: center; }
+}

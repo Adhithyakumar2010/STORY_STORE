@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Catalog | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+</head>
+<body class="story-store-body">
+
+    {% set active_page = 'books' %}
+    {% include 'story_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main section container">
+        <!-- Breadcrumb Navigation -->
+        <nav style="margin-bottom:1.5rem; font-size:var(--small-font-size); color:var(--text-color-light);">
+            <a href="{{ url_for('story_home') }}" style="color:var(--text-color);">Home</a> &gt; 
+            <span style="color:var(--first-color);">Book Catalog</span>
+        </nav>
+
+        <!-- Top Search Bar & Toolbar -->
+        <div style="background:var(--container-color); border:1px solid var(--card-border); border-radius:1rem; padding:1.25rem; margin-bottom:2rem; position:relative;">
+            <form action="{{ url_for('story_books') }}" method="get" id="catalogSearchForm" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+                <!-- Instant Search Input -->
+                <div style="flex:1; min-width:260px; position:relative;">
+                    <input type="text" name="q" id="instantSearchInput" value="{{ active_filters.q|default('') }}" placeholder="Search by title, author, category, genre..." autocomplete="off" style="width:100%; background:rgba(0,0,0,0.4); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                    <!-- Live Search Dropdown -->
+                    <div id="liveSearchDropdown" style="display:none; position:absolute; top:110%; left:0; right:0; background:#0e0f0c; border:1px solid var(--first-color); border-radius:.5rem; z-index:100; max-height:300px; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.8);"></div>
+                </div>
+
+                <!-- Sorting Dropdown -->
+                <select name="sort" onchange="this.form.submit();" style="background:rgba(0,0,0,0.4); color:#fff; border:1px solid var(--card-border); padding:.75rem 1rem; border-radius:.5rem;">
+                    <option value="newest" {% if active_filters.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if active_filters.sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="price_low" {% if active_filters.sort == 'price_low' %}selected{% endif %}>Price: Low → High</option>
+                    <option value="price_high" {% if active_filters.sort == 'price_high' %}selected{% endif %}>Price: High → Low</option>
+                    <option value="bestselling" {% if active_filters.sort == 'bestselling' %}selected{% endif %}>Best Selling</option>
+                    <option value="rating" {% if active_filters.sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                    <option value="alpha_az" {% if active_filters.sort == 'alpha_az' %}selected{% endif %}>Alphabetical A–Z</option>
+                    <option value="alpha_za" {% if active_filters.sort == 'alpha_za' %}selected{% endif %}>Alphabetical Z–A</option>
+                </select>
+
+                <button type="submit" class="button" style="padding:.75rem 1.5rem;">Search</button>
+                <a href="{{ url_for('story_books') }}" class="button button--ghost" style="padding:.75rem 1.25rem;">Reset</a>
+            </form>
+        </div>
+
+        <!-- Catalog Layout: Filter Sidebar + Books Grid -->
+        <div style="display:grid; grid-template-columns: 260px 1fr; gap:2rem;">
+            <!-- Filter Sidebar -->
+            <aside style="background:var(--container-color); border:1px solid var(--card-border); border-radius:1rem; padding:1.5rem; height:fit-content;">
+                <h3 style="font-size:var(--h3-font-size); border-bottom:1px solid var(--card-border); padding-bottom:.75rem; margin-bottom:1.25rem;">Filter Books</h3>
+
+                <form action="{{ url_for('story_books') }}" method="get">
+                    {% if active_filters.q %}<input type="hidden" name="q" value="{{ active_filters.q }}">{% endif %}
+
+                    <!-- Genre Filter -->
+                    <div style="margin-bottom:1.5rem;">
+                        <label style="font-size:var(--small-font-size); font-weight:var(--font-semi-bold); display:block; margin-bottom:.5rem;">Genre</label>
+                        <select name="genre" onchange="this.form.submit();" style="width:100%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid var(--card-border); padding:.6rem; border-radius:.4rem;">
+                            <option value="">All Genres</option>
+                            <option value="Fiction" {% if active_filters.genre == 'Fiction' %}selected{% endif %}>Fiction</option>
+                            <option value="Fantasy" {% if active_filters.genre == 'Fantasy' %}selected{% endif %}>Fantasy</option>
+                            <option value="Thriller" {% if active_filters.genre == 'Thriller' %}selected{% endif %}>Thriller</option>
+                            <option value="Romance" {% if active_filters.genre == 'Romance' %}selected{% endif %}>Romance</option>
+                            <option value="Horror" {% if active_filters.genre == 'Horror' %}selected{% endif %}>Horror</option>
+                            <option value="Comics" {% if active_filters.genre == 'Comics' %}selected{% endif %}>Comics</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Filter -->
+                    <div style="margin-bottom:1.5rem;">
+                        <label style="font-size:var(--small-font-size); font-weight:var(--font-semi-bold); display:block; margin-bottom:.5rem;">Price Range</label>
+                        <select name="price" onchange="this.form.submit();" style="width:100%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid var(--card-border); padding:.6rem; border-radius:.4rem;">
+                            <option value="">All Prices</option>
+                            <option value="under500" {% if active_filters.price == 'under500' %}selected{% endif %}>Under ₹500</option>
+                            <option value="500-1000" {% if active_filters.price == '500-1000' %}selected{% endif %}>₹500 – ₹1000</option>
+                            <option value="1000-2500" {% if active_filters.price == '1000-2500' %}selected{% endif %}>₹1000 – ₹2500</option>
+                            <option value="above2500" {% if active_filters.price == 'above2500' %}selected{% endif %}>Above ₹2500</option>
+                        </select>
+                    </div>
+
+                    <!-- Stock Availability -->
+                    <div style="margin-bottom:1.5rem;">
+                        <label style="font-size:var(--small-font-size); font-weight:var(--font-semi-bold); display:block; margin-bottom:.5rem;">Availability</label>
+                        <select name="availability" onchange="this.form.submit();" style="width:100%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid var(--card-border); padding:.6rem; border-radius:.4rem;">
+                            <option value="">All Items</option>
+                            <option value="instock" {% if active_filters.availability == 'instock' %}selected{% endif %}>In Stock</option>
+                            <option value="outstock" {% if active_filters.availability == 'outstock' %}selected{% endif %}>Out of Stock</option>
+                        </select>
+                    </div>
+
+                    <!-- Special Collection Badges -->
+                    <div style="margin-bottom:1.5rem;">
+                        <label style="font-size:var(--small-font-size); font-weight:var(--font-semi-bold); display:block; margin-bottom:.5rem;">Special Collection</label>
+                        <select name="collection" onchange="this.form.submit();" style="width:100%; background:rgba(0,0,0,0.4); color:#fff; border:1px solid var(--card-border); padding:.6rem; border-radius:.4rem;">
+                            <option value="">All Collections</option>
+                            <option value="bestseller" {% if active_filters.collection == 'bestseller' %}selected{% endif %}>Best Seller</option>
+                            <option value="trending" {% if active_filters.collection == 'trending' %}selected{% endif %}>Trending</option>
+                            <option value="new" {% if active_filters.collection == 'new' %}selected{% endif %}>New Arrival</option>
+                            <option value="editors" {% if active_filters.collection == 'editors' %}selected{% endif %}>Editor's Choice</option>
+                        </select>
+                    </div>
+
+                    <a href="{{ url_for('story_books') }}" class="button button--ghost" style="width:100%; text-align:center; font-size:.85rem; padding:.5rem;">Clear Filters</a>
+                </form>
+            </aside>
+
+            <!-- Books Grid -->
+            <div>
+                {% if books %}
+                <div class="books__container grid" style="padding-top:0;">
+                    {% for book in books %}
+                    <article class="book-card">
+                        <!-- Badges -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:.5rem;">
+                            <span class="book-card__tag">{{ book.category }}</span>
+                            <button type="button" onclick="toggleWishlist('{{ book.id }}', this);" class="button button--ghost" style="padding:.2rem .5rem; font-size:.85rem; border:none; color:{% if book.id in wishlist_ids %}#e74c3c{% else %}#fff{% endif %};">❤️</button>
+                        </div>
+
+                        {% if book.is_bestseller %}<span style="background:#e67e22; color:#fff; font-size:.65rem; padding:.15rem .4rem; border-radius:3px; position:absolute; top:10px; left:10px; font-weight:bold;">BEST SELLER</span>{% endif %}
+
+                        <img src="{{ url_for('static', filename=book.image) }}" alt="{{ book.name }}" class="book-card__img">
+                        
+                        <h3 class="book-card__title">{{ book.name }}</h3>
+                        <p class="book-card__author">By {{ book.author|default('AK Authors') }}</p>
+                        
+                        <!-- Rating Stars -->
+                        <div style="color:#f39c12; font-size:.85rem; margin-bottom:.5rem;">
+                            ★★★★★ <span style="color:var(--text-color-light);">({{ book.rating|default(4.8) }})</span>
+                        </div>
+
+                        <!-- Stock Indicator -->
+                        <div style="font-size:var(--smaller-font-size); margin-bottom:.75rem;">
+                            {% if book.stock > 0 %}
+                            <span style="color:#2ecc71; font-weight:bold;">✓ In Stock</span>
+                            {% else %}
+                            <span style="color:#e74c3c; font-weight:bold;">✕ Out of Stock</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="book-card__footer">
+                            <div>
+                                <span class="book-card__price">₹{{ book.price }}</span>
+                                {% if book.discount_price > 0 %}
+                                <small style="text-decoration:line-through; color:var(--text-color-light); display:block; font-size:.75rem;">₹{{ book.price + 150 }}</small>
+                                {% endif %}
+                            </div>
+                            <div style="display:flex; gap:.4rem;">
+                                <a href="{{ url_for('story_book_details', book_id=book.id) }}" class="button button--ghost" style="padding:.4rem .7rem; font-size:.75rem;">Details</a>
+                                <form action="{{ url_for('story_cart_add') }}" method="post" style="margin:0;">
+                                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="button" style="padding:.4rem .8rem; font-size:.75rem;">+ Cart</button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-cart-card" style="padding:3rem;">
+                    <div class="empty-cart-icon">🔍</div>
+                    <h2>No Books Found</h2>
+                    <p style="color:var(--text-color-light); margin-bottom:1.5rem;">Try adjusting your search criteria or clearing filters.</p>
+                    <a href="{{ url_for('story_books') }}" class="button">View All Books &rarr;</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    {% include 'story_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/story-store.js') }}"></script>
+</body>
+</html>

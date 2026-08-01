@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-cart.css') }}">
+</head>
+<body class="story-store-body">
+
+    {% set active_page = 'cart' %}
+    {% include 'story_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main section container">
+        <div style="margin-bottom: 2rem;">
+            <a href="{{ url_for('story_books') }}" class="continue-shopping-link">&larr; Continue Shopping (All Books)</a>
+        </div>
+
+        <h1 class="section__title">Shopping Cart</h1>
+
+        {% if cart_items %}
+        <div class="cart-layout">
+            <div class="cart-table-card">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Book Cover & Title</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td>
+                                <div class="cart-item-info">
+                                    <img src="{{ url_for('static', filename=item.image) }}" alt="{{ item.name }}">
+                                    <div>
+                                        <a href="{{ url_for('story_book_details', book_id=item.id) }}" style="color:var(--title-color); font-weight:var(--font-semi-bold); font-size:var(--normal-font-size);">{{ item.name }}</a>
+                                        <small style="display:block; color:var(--text-color-light);">{{ item.category }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>₹{{ item.price }}</td>
+                            <td>
+                                <div class="cart-qty-form">
+                                    <form action="{{ url_for('story_cart_update') }}" method="post" style="display:inline;">
+                                        <input type="hidden" name="book_id" value="{{ item.id }}">
+                                        <input type="hidden" name="action" value="decrease">
+                                        <button type="submit" class="cart-qty-btn" title="Decrease quantity">-</button>
+                                    </form>
+                                    <span class="cart-qty-val">{{ item.quantity }}</span>
+                                    <form action="{{ url_for('story_cart_update') }}" method="post" style="display:inline;">
+                                        <input type="hidden" name="book_id" value="{{ item.id }}">
+                                        <input type="hidden" name="action" value="increase">
+                                        <button type="submit" class="cart-qty-btn" title="Increase quantity">+</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td><strong style="color:var(--title-color);">₹{{ item.subtotal }}</strong></td>
+                            <td>
+                                <form action="{{ url_for('story_cart_update') }}" method="post" style="display:inline;">
+                                    <input type="hidden" name="book_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="remove">
+                                    <button type="submit" class="btn-remove" onclick="return confirm('Remove {{ item.name }} from cart?');">🗑 Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="cart-summary-card">
+                <h3>Order Summary</h3>
+                <div class="cart-summary-row">
+                    <span>Subtotal</span>
+                    <span>₹{{ subtotal }}</span>
+                </div>
+                <div class="cart-summary-row">
+                    <span>Shipping</span>
+                    <span style="color:#2ecc71; font-weight:var(--font-bold);">FREE</span>
+                </div>
+                <div class="cart-summary-row total">
+                    <span>Grand Total</span>
+                    <span style="color:var(--first-color);">₹{{ total }}</span>
+                </div>
+                <div style="margin-top: 2rem;">
+                    <a href="{{ url_for('story_checkout') }}" class="button" style="width:100%; text-align:center;">Proceed to Checkout &rarr;</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-cart-card">
+            <div class="empty-cart-icon">📚</div>
+            <h2 style="margin-bottom:.5rem;">Your Cart is Empty</h2>
+            <p style="color:var(--text-color-light); margin-bottom:2rem;">Explore our collection of stories, graphic novels, and art books.</p>
+            <a href="{{ url_for('story_books') }}" class="button">Continue Shopping &rarr;</a>
+        </div>
+        {% endif %}
+    </main>
+
+    {% include 'story_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/story-cart.js') }}"></script>
+</body>
+</html>

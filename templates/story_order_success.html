@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Successful | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-orders.css') }}">
+</head>
+<body class="story-store-body">
+
+    <header class="header">
+        <div class="container nav">
+            <a class="nav__logo" href="{{ url_for('story_home') }}">AK <span>STORY STORE</span></a>
+            <ul class="nav__list">
+                <li><a href="{{ url_for('story_home') }}" class="nav__link">Home</a></li>
+                <li><a href="{{ url_for('story_books') }}" class="nav__link">Books</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="main section container order-success-wrapper">
+        <div class="order-success-card">
+            <div class="success-icon-animated">✓</div>
+            <h1 style="font-size:var(--h1-font-size); margin-bottom:.5rem; color:var(--title-color);">Payment Successful!</h1>
+            <p style="color:var(--text-color); margin-bottom:1.5rem;">Thank you for your order, <strong>{{ order.customer_name }}</strong>! We have received your payment and queued your shipment.</p>
+
+            <div class="order-details-box">
+                <div class="order-details-grid">
+                    <div class="detail-group">
+                        <label>Order Number</label>
+                        <p>#ORD-{{ order.order_id }}</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Payment ID</label>
+                        <p>{{ order.payment_id }}</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Transaction ID</label>
+                        <p>{{ order.txn_id }}</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Order Date</label>
+                        <p>{{ order.order_date }}</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Estimated Delivery</label>
+                        <p style="color:#2ecc71;">{{ order.est_delivery }}</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Payment Method</label>
+                        <p>{{ order.payment_method }}</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1rem;">
+                    <label style="font-size:var(--smaller-font-size); color:var(--text-color-light); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:.25rem;">Shipping Address</label>
+                    <p style="color:var(--title-color); font-weight:var(--font-medium);">{{ order.address }}</p>
+                </div>
+
+                <div>
+                    <label style="font-size:var(--smaller-font-size); color:var(--text-color-light); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:.5rem;">Ordered Books</label>
+                    <p style="color:var(--title-color); font-weight:var(--font-semi-bold);">{{ order.items }}</p>
+                </div>
+
+                <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:var(--normal-font-size); color:var(--text-color);">Total Amount Paid</span>
+                    <span style="font-size:1.5rem; font-weight:var(--font-black); color:var(--first-color);">₹{{ order.total }}</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="order-actions-row">
+                <a href="{{ url_for('story_download_receipt', order_id=order.order_id) }}" class="btn-pdf-download">
+                    📄 Download Receipt (PDF)
+                </a>
+                <a href="{{ url_for('story_books') }}" class="button">
+                    Continue Shopping &rarr;
+                </a>
+                <a href="{{ url_for('customer_orders') }}" class="button button--ghost">
+                    Go to My Orders &rarr;
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <span class="footer__copy">&#169; 2026 AK Story Store. All rights reserved.</span>
+    </footer>
+</body>
+</html>

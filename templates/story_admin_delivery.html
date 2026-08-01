@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Delivery Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-books.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_analytics') }}" class="sidebar-link"><span class="icon">📈</span> <span>Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_delivery') }}" class="sidebar-link active"><span class="icon">🚚</span> <span>Delivery Management</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_flash_sales') }}" class="sidebar-link"><span class="icon">⚡</span> <span>Flash Sales</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_festival_offers') }}" class="sidebar-link"><span class="icon">🎪</span> <span>Festival Offers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_combo_offers') }}" class="sidebar-link"><span class="icon">📦</span> <span>Combo Offers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reviews') }}" class="sidebar-link"><span class="icon">⭐</span> <span>Reviews Moderation</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_review_reports') }}" class="sidebar-link"><span class="icon">🚩</span> <span>Review Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_best_sellers') }}" class="sidebar-link"><span class="icon">⭐</span> <span>Best Sellers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_least_sellers') }}" class="sidebar-link"><span class="icon">📉</span> <span>Least Sellers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_categories') }}" class="sidebar-link"><span class="icon">🏷️</span> <span>Categories</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_publishers') }}" class="sidebar-link"><span class="icon">🏢</span> <span>Publishers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_authors') }}" class="sidebar-link"><span class="icon">🖋️</span> <span>Authors</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_genres') }}" class="sidebar-link"><span class="icon">🎭</span> <span>Genres</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_coupons') }}" class="sidebar-link"><span class="icon">🎟️</span> <span>Coupons</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_inventory') }}" class="sidebar-link"><span class="icon">📦</span> <span>Inventory</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_orders') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Orders</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_customers') }}" class="sidebar-link"><span class="icon">👥</span> <span>Customers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reports_monthly') }}" class="sidebar-link"><span class="icon">📅</span> <span>Monthly Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reports_yearly') }}" class="sidebar-link"><span class="icon">📊</span> <span>Yearly Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_revenue') }}" class="sidebar-link"><span class="icon">💰</span> <span>Revenue Stats</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_customer_analytics') }}" class="sidebar-link"><span class="icon">👤</span> <span>Customer Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_export_center') }}" class="sidebar-link"><span class="icon">📥</span> <span>Export Center</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_settings') }}" class="sidebar-link"><span class="icon">⚙️</span> <span>Settings</span></a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout"><span>🚪</span> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Delivery & Shipment Tracking Control</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <!-- Metric Cards Grid -->
+                <div class="stats-grid" style="margin-bottom:2rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(52,152,219,0.2); color:#3498db;">🚚</div>
+                        <div>
+                            <div class="stat-val">{{ shipments|length }}</div>
+                            <div class="stat-lbl">Total Shipments</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(46,204,113,0.2); color:#2ecc71;">✓</div>
+                        <div>
+                            <div class="stat-val" style="color:#2ecc71;">{{ delivered_count }}</div>
+                            <div class="stat-lbl">Delivered</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(241,196,15,0.2); color:#f1c40f;">⏱️</div>
+                        <div>
+                            <div class="stat-val" style="color:#f1c40f;">{{ transit_count }}</div>
+                            <div class="stat-lbl">In Transit</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Shipments Control Table -->
+                <div class="content-card">
+                    <h3 style="color:#fff; margin:0 0 1.25rem;">Active Shipments & Courier Tracking</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Order</th>
+                                    <th>Tracking #</th>
+                                    <th>Courier</th>
+                                    <th>Current Location</th>
+                                    <th>Status</th>
+                                    <th>Est. Delivery</th>
+                                    <th>Update Shipment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if shipments %}
+                                {% for s in shipments %}
+                                <tr>
+                                    <td><strong>#ORD-{{ s.order_id }}</strong><br/><small style="color:var(--text-muted);">{{ s.customer_name }}</small></td>
+                                    <td><strong style="color:var(--first-color);">{{ s.tracking_number }}</strong></td>
+                                    <td><span style="background:rgba(255,255,255,0.1); padding:.2rem .5rem; border-radius:.3rem; font-size:.8rem;">{{ s.courier_name }}</span></td>
+                                    <td>{{ s.current_location }}</td>
+                                    <td>
+                                        {% if s.shipment_status == 'Delivered' %}
+                                        <span style="color:#2ecc71; font-weight:bold;">Delivered</span>
+                                        {% else %}
+                                        <span style="color:#f1c40f; font-weight:bold;">{{ s.shipment_status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ s.estimated_delivery }}</td>
+                                    <td>
+                                        <form action="{{ url_for('story_admin_update_shipment') }}" method="post" style="display:flex; flex-direction:column; gap:.35rem;">
+                                            <input type="hidden" name="tracking_id" value="{{ s.id }}">
+                                            <select name="shipment_status" style="background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.25rem .4rem; border-radius:.3rem; font-size:.75rem;">
+                                                <option value="Order Confirmed" {% if s.shipment_status == 'Order Confirmed' %}selected{% endif %}>Order Confirmed</option>
+                                                <option value="Packed" {% if s.shipment_status == 'Packed' %}selected{% endif %}>Packed</option>
+                                                <option value="Shipped" {% if s.shipment_status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                                <option value="In Transit" {% if s.shipment_status == 'In Transit' %}selected{% endif %}>In Transit</option>
+                                                <option value="Out For Delivery" {% if s.shipment_status == 'Out For Delivery' %}selected{% endif %}>Out For Delivery</option>
+                                                <option value="Delivered" {% if s.shipment_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                                <option value="Returned" {% if s.shipment_status == 'Returned' %}selected{% endif %}>Returned</option>
+                                            </select>
+                                            <input type="text" name="current_location" value="{{ s.current_location }}" placeholder="Current Hub/City..." style="background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.25rem .4rem; border-radius:.3rem; font-size:.75rem;">
+                                            <button type="submit" style="background:var(--first-color); color:#fff; border:none; padding:.25rem .5rem; border-radius:.3rem; font-size:.75rem; font-weight:600; cursor:pointer;">Update</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" style="text-align:center; padding:2.5rem; color:var(--text-muted);">No active shipments generated yet. Assign courier from Orders panel!</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

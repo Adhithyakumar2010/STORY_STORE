@@ -1,0 +1,208 @@
+/*=============== STORY STORE ADMIN STYLESHEET ===============*/
+
+/* Stats Summary Cards Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--container-color);
+    border: 1px solid var(--card-border);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform .3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: .75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    font-weight: bold;
+}
+
+.stat-val {
+    font-size: 1.5rem;
+    font-weight: var(--font-black);
+    color: var(--title-color);
+    line-height: 1.1;
+}
+
+.stat-lbl {
+    font-size: var(--smaller-font-size);
+    color: var(--text-color-light);
+    margin-top: 2px;
+}
+
+/* Admin Table Card */
+.admin-table-card {
+    background: var(--container-color);
+    border: 1px solid var(--card-border);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.admin-table th {
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--title-color);
+    padding: 1rem 1.25rem;
+    font-size: var(--small-font-size);
+    font-weight: var(--font-semi-bold);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.admin-table td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.admin-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.book-thumb {
+    width: 45px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: .35rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Stock Badges */
+.stock-badge {
+    display: inline-block;
+    padding: .2rem .5rem;
+    border-radius: .25rem;
+    font-size: .7rem;
+    font-weight: bold;
+    margin-top: .25rem;
+}
+
+.stock-badge.instock { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
+.stock-badge.lowstock { background: rgba(243, 156, 18, 0.2); color: #f39c12; border: 1px solid #f39c12; }
+.stock-badge.outstock { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+
+/* Stock Adjustment Controls */
+.stock-adjust-btns {
+    display: flex;
+    gap: .3rem;
+}
+
+.stock-adjust-btns button {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--title-color);
+    border: 1px solid var(--card-border);
+    padding: .2rem .5rem;
+    border-radius: .25rem;
+    font-size: .75rem;
+    font-weight: var(--font-medium);
+    transition: .2s;
+}
+
+.stock-adjust-btns button:hover {
+    background: var(--first-color);
+    color: #fff;
+    border-color: var(--first-color);
+}
+
+/* Action Buttons */
+.btn-action {
+    width: 32px;
+    height: 32px;
+    border-radius: .4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .9rem;
+    transition: .2s;
+}
+
+.btn-action.view { background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid #3498db; }
+.btn-action.edit { background: rgba(243, 156, 18, 0.2); color: #f39c12; border: 1px solid #f39c12; }
+.btn-action.delete { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+
+.btn-action:hover {
+    transform: scale(1.1);
+}
+
+/* Modal Overlays & Cards */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.modal-overlay.active {
+    display: flex;
+    animation: modalFadeIn .3s ease;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal-card {
+    background: #11120f;
+    border: 1px solid var(--card-border);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+/* Form Controls */
+.form-label {
+    display: block;
+    font-size: var(--small-font-size);
+    font-weight: var(--font-medium);
+    color: var(--text-color);
+    margin-bottom: .35rem;
+}
+
+.form-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--card-border);
+    color: #fff;
+    padding: .75rem 1rem;
+    border-radius: .5rem;
+    font-size: var(--normal-font-size);
+    transition: border-color .2s;
+}
+
+.form-input:focus {
+    border-color: var(--first-color);
+}

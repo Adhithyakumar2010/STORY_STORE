@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Book Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin.css') }}">
+</head>
+<body class="story-store-body">
+
+    <!-- Admin Header -->
+    <header class="header">
+        <div class="container nav">
+            <a class="nav__logo" href="{{ url_for('story_admin') }}">
+                AK <span>STORY STORE ADMIN</span>
+            </a>
+            <ul class="nav__list">
+                <li><a href="{{ url_for('story_admin') }}" class="nav__link active">Dashboard</a></li>
+                <li><a href="{{ url_for('story_home') }}" class="nav__link" target="_blank">Storefront ↗</a></li>
+                <li><a href="{{ url_for('admin') }}" class="nav__link">Photography Admin</a></li>
+                <li><a href="{{ url_for('logout') }}" class="nav__link" style="color:#e74c3c;">Logout</a></li>
+            </ul>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main section container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+            <div>
+                <h1 style="font-size:var(--h1-font-size); color:var(--title-color);">Story Store Admin Panel</h1>
+                <p style="color:var(--text-color-light); font-size:var(--small-font-size);">Manage books, upload covers, track stock levels, and inspect analytics.</p>
+            </div>
+            <button type="button" onclick="openAddBookModal();" class="button" style="font-size:var(--small-font-size); padding:.75rem 1.5rem;">
+                + Add New Book
+            </button>
+        </div>
+
+        <!-- Module 8: Analytics Stat Summary Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(255, 72, 32, 0.2); color:var(--first-color);">📚</div>
+                <div>
+                    <div class="stat-val">{{ total_books }}</div>
+                    <div class="stat-lbl">Total Books</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(46, 204, 113, 0.2); color:#2ecc71;">✓</div>
+                <div>
+                    <div class="stat-val" style="color:#2ecc71;">{{ available_books }}</div>
+                    <div class="stat-lbl">Available (In Stock)</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(231, 76, 60, 0.2); color:#e74c3c;">✕</div>
+                <div>
+                    <div class="stat-val" style="color:#e74c3c;">{{ out_of_stock }}</div>
+                    <div class="stat-lbl">Out of Stock</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(243, 156, 18, 0.2); color:#f39c12;">⚠️</div>
+                <div>
+                    <div class="stat-val" style="color:#f39c12;">{{ low_stock }}</div>
+                    <div class="stat-lbl">Low Stock (&le; 5)</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(52, 152, 219, 0.2); color:#3498db;">🏷️</div>
+                <div>
+                    <div class="stat-val">{{ total_categories }}</div>
+                    <div class="stat-lbl">Total Categories</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(155, 89, 182, 0.2); color:#9b59b6;">🏢</div>
+                <div>
+                    <div class="stat-val">{{ total_publishers }}</div>
+                    <div class="stat-lbl">Publishers</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Module 7: Search & Filter Bar -->
+        <div style="background:var(--container-color); border:1px solid var(--card-border); border-radius:1rem; padding:1.25rem; margin-bottom:2rem;">
+            <form action="{{ url_for('story_admin') }}" method="get" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center;">
+                <!-- Search Input -->
+                <div style="flex:1; min-width:240px;">
+                    <input type="text" name="q" value="{{ active_filters.q|default('') }}" placeholder="Search title, author, ISBN, category, genre..." style="width:100%; background:rgba(0,0,0,0.4); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                </div>
+
+                <!-- Category Filter -->
+                <select name="category" onchange="this.form.submit();" style="background:rgba(0,0,0,0.4); color:#fff; border:1px solid var(--card-border); padding:.75rem 1rem; border-radius:.5rem;">
+                    <option value="">All Categories</option>
+                    {% for cat in all_categories %}
+                    <option value="{{ cat }}" {% if active_filters.category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Stock Filter -->
+                <select name="stock" onchange="this.form.submit();" style="background:rgba(0,0,0,0.4); color:#fff; border:1px solid var(--card-border); padding:.75rem 1rem; border-radius:.5rem;">
+                    <option value="">All Stock Levels</option>
+                    <option value="instock" {% if active_filters.stock == 'instock' %}selected{% endif %}>In Stock (&gt; 5)</option>
+                    <option value="lowstock" {% if active_filters.stock == 'lowstock' %}selected{% endif %}>Low Stock (1-5)</option>
+                    <option value="outstock" {% if active_filters.stock == 'outstock' %}selected{% endif %}>Out of Stock (0)</option>
+                </select>
+
+                <button type="submit" class="button" style="padding:.75rem 1.25rem;">Search</button>
+                <a href="{{ url_for('story_admin') }}" class="button button--ghost" style="padding:.75rem 1rem;">Reset</a>
+            </form>
+        </div>
+
+        <!-- Module 4: Book Management Table -->
+        <div class="admin-table-card">
+            <div style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0;">Book Inventory ({{ total_items }} Records)</h3>
+                <span style="font-size:var(--small-font-size); color:var(--text-color-light);">Page {{ page }} of {{ total_pages }}</span>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Cover</th>
+                            <th>Title & Author</th>
+                            <th>ISBN & Category</th>
+                            <th>Price</th>
+                            <th>Stock & Status</th>
+                            <th>Adjust Stock</th>
+                            <th style="text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if books %}
+                        {% for b in books %}
+                        <tr>
+                            <td>
+                                <img src="{{ url_for('static', filename=b.image) }}" alt="{{ b.name }}" class="book-thumb">
+                            </td>
+                            <td>
+                                <strong style="color:var(--title-color); font-size:var(--normal-font-size); display:block;">{{ b.name }}</strong>
+                                <small style="color:var(--text-color-light);">By {{ b.author|default('AK Authors') }} &middot; {{ b.publisher|default('AK Pub') }}</small>
+                            </td>
+                            <td>
+                                <div style="font-size:var(--small-font-size); font-family:monospace; color:var(--title-color);">{{ b.isbn|default('N/A') }}</div>
+                                <span class="book-card__tag" style="margin-top:.25rem;">{{ b.category }}</span>
+                            </td>
+                            <td>
+                                <strong style="color:var(--first-color); font-size:1.1rem;">₹{{ b.price }}</strong>
+                                {% if b.discount_price > 0 %}
+                                <small style="display:block; color:var(--text-color-light); text-decoration:line-through;">₹{{ b.discount_price }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span id="stock-val-{{ b.id }}" style="font-weight:bold; color:var(--title-color);">{{ b.stock }} units</span>
+                                <div>
+                                    {% if b.stock > 5 %}
+                                    <span class="stock-badge instock">In Stock</span>
+                                    {% elif b.stock > 0 %}
+                                    <span class="stock-badge lowstock">Low Stock</span>
+                                    {% else %}
+                                    <span class="stock-badge outstock">Out of Stock</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <!-- Quick Stock Adjustment Controls -->
+                                <div class="stock-adjust-btns">
+                                    <button type="button" onclick="adjustBookStock('{{ b.id }}', 'decrease', 1);" title="Decrease by 1">-1</button>
+                                    <button type="button" onclick="adjustBookStock('{{ b.id }}', 'increase', 1);" title="Increase by 1">+1</button>
+                                    <button type="button" onclick="adjustBookStock('{{ b.id }}', 'increase', 5);" title="Increase by 5">+5</button>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="display:flex; justify-content:flex-end; gap:.4rem;">
+                                    <button type="button" onclick="previewBook('{{ b.id }}');" class="btn-action view" title="View Details">👁️</button>
+                                    <button type="button" onclick="editBook('{{ b.id }}');" class="btn-action edit" title="Edit Book">✏️</button>
+                                    <button type="button" onclick="confirmDeleteBook('{{ b.id }}', '{{ b.name|escape }}');" class="btn-action delete" title="Delete Book">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding:3rem; color:var(--text-color-light);">
+                                No books found matching your criteria.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <div style="padding:1.25rem; display:flex; justify-content:center; gap:.5rem; border-top:1px solid var(--card-border);">
+                {% if page > 1 %}
+                <a href="{{ url_for('story_admin', page=page-1, q=active_filters.q, category=active_filters.category, stock=active_filters.stock) }}" class="button button--ghost" style="padding:.4rem .8rem; font-size:.85rem;">&larr; Prev</a>
+                {% endif %}
+                <span style="align-self:center; font-size:var(--small-font-size); color:var(--text-color-light); padding:0 .5rem;">Page {{ page }} of {{ total_pages }}</span>
+                {% if page < total_pages %}
+                <a href="{{ url_for('story_admin', page=page+1, q=active_filters.q, category=active_filters.category, stock=active_filters.stock) }}" class="button button--ghost" style="padding:.4rem .8rem; font-size:.85rem;">Next &rarr;</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Modal 1: Add / Edit Book Form Modal -->
+    <div class="modal-overlay" id="bookFormModal">
+        <div class="modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:1rem; margin-bottom:1.5rem;">
+                <h2 id="modalFormTitle" style="margin:0; font-size:var(--h2-font-size); color:var(--title-color);">Add New Book</h2>
+                <button type="button" onclick="closeBookModal();" style="background:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+
+            <form action="{{ url_for('story_admin_book_add') }}" method="post" enctype="multipart/form-data" id="adminBookForm">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem;">
+                    <div>
+                        <label class="form-label">Book Title *</label>
+                        <input type="text" name="title" id="form_title" placeholder="e.g. The Armor of Light" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Author *</label>
+                        <input type="text" name="author" id="form_author" placeholder="e.g. Ken Follett" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Publisher</label>
+                        <input type="text" name="publisher" id="form_publisher" placeholder="e.g. AK Publications" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Category *</label>
+                        <input type="text" name="category" id="form_category" placeholder="e.g. Historical novel" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Genre</label>
+                        <input type="text" name="genre" id="form_genre" placeholder="e.g. Fiction" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Language</label>
+                        <input type="text" name="language" id="form_language" placeholder="e.g. English" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">ISBN (Unique)</label>
+                        <input type="text" name="isbn" id="form_isbn" placeholder="978-0-123456-78-9" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Publication Year</label>
+                        <input type="text" name="pub_date" id="form_pub_date" placeholder="2024" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Price (₹) *</label>
+                        <input type="number" name="price" id="form_price" min="0" placeholder="299" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Discount Price (₹)</label>
+                        <input type="number" name="discount_price" id="form_discount_price" min="0" placeholder="0" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Stock Quantity *</label>
+                        <input type="number" name="stock" id="form_stock" min="0" placeholder="10" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Pages</label>
+                        <input type="number" name="pages" id="form_pages" min="1" placeholder="350" class="form-input">
+                    </div>
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" id="form_description" rows="3" placeholder="Enter book synopsis and details..." class="form-input"></textarea>
+                </div>
+
+                <!-- Module 2: Image Upload with Preview -->
+                <div style="margin-top:1.25rem; background:rgba(0,0,0,0.3); border:1px solid var(--card-border); padding:1rem; border-radius:.75rem;">
+                    <h4 style="color:var(--title-color); margin-bottom:.75rem;">Image Uploads (JPG, PNG, WEBP)</h4>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem;">
+                        <div>
+                            <label class="form-label">Cover Image</label>
+                            <input type="file" name="cover_image" accept=".jpg,.jpeg,.png,.webp" onchange="previewCoverImage(this);" class="form-input" style="padding:.4rem;">
+                            <div style="margin-top:.5rem;">
+                                <img id="coverPreviewImg" src="" alt="Cover Preview" style="display:none; height:90px; border-radius:.4rem; border:1px solid var(--first-color);">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Gallery Images (Multiple)</label>
+                            <input type="file" name="gallery_images" accept=".jpg,.jpeg,.png,.webp" multiple onchange="previewGalleryImages(this);" class="form-input" style="padding:.4rem;">
+                            <div id="galleryPreviewGrid" style="display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.5rem;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:1.5rem; display:flex; justify-content:flex-end; gap:1rem;">
+                    <button type="button" onclick="closeBookModal();" class="button button--ghost">Cancel</button>
+                    <button type="submit" id="btnSaveBook" class="button">Save Book &rarr;</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Book Details / Preview Modal -->
+    <div class="modal-overlay" id="bookDetailsModal">
+        <div class="modal-card" style="max-width:700px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:1rem; margin-bottom:1.5rem;">
+                <h2 style="margin:0; font-size:var(--h2-font-size); color:var(--title-color);">Book Preview</h2>
+                <button type="button" onclick="closePreviewModal();" style="background:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 180px 1fr; gap:1.5rem; align-items:start;">
+                <div>
+                    <img id="previewModalCover" src="" alt="Book Cover" style="width:100%; border-radius:.75rem; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+                </div>
+                <div>
+                    <span id="previewModalCategory" class="book-card__tag">Category</span>
+                    <h2 id="previewModalTitle" style="color:var(--title-color); margin:.5rem 0 .25rem;">Title</h2>
+                    <p id="previewModalAuthor" style="color:var(--text-color-light); font-size:var(--small-font-size); margin-bottom:1rem;">Author</p>
+
+                    <div style="font-size:1.4rem; font-weight:var(--font-black); color:var(--first-color); margin-bottom:1rem;" id="previewModalPrice">₹0</div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:.5rem; font-size:var(--small-font-size); background:rgba(0,0,0,0.3); padding:.75rem; border-radius:.5rem; margin-bottom:1rem;">
+                        <div><strong>ISBN:</strong> <span id="previewModalIsbn">N/A</span></div>
+                        <div><strong>Stock:</strong> <span id="previewModalStock">0</span></div>
+                        <div><strong>Genre:</strong> <span id="previewModalGenre">N/A</span></div>
+                        <div><strong>Language:</strong> <span id="previewModalLang">N/A</span></div>
+                    </div>
+
+                    <p id="previewModalDesc" style="font-size:var(--small-font-size); color:var(--text-color);">Description</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Delete Confirmation Modal (Module 6) -->
+    <div class="modal-overlay" id="deleteConfirmModal">
+        <div class="modal-card" style="max-width:480px; text-align:center;">
+            <div style="font-size:3.5rem; margin-bottom:.5rem;">🗑️</div>
+            <h2 style="color:var(--title-color); margin-bottom:.5rem;">Delete Book Confirmation</h2>
+            <p style="color:var(--text-color-light); margin-bottom:1.5rem;" id="deleteConfirmText">Are you sure you want to delete this book?</p>
+            
+            <form action="" method="post" id="deleteBookForm">
+                <div style="display:flex; justify-content:center; gap:1rem;">
+                    <button type="button" onclick="closeDeleteModal();" class="button button--ghost">Cancel</button>
+                    <button type="submit" class="button" style="background:#e74c3c;">Yes, Delete Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <span class="footer__copy">&#169; 2026 AK Story Store. All rights reserved.</span>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/story-admin.js') }}"></script>
+</body>
+</html>

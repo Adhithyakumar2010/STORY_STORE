@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AK STORY STORE | Modern Bookstore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+</head>
+<body class="story-store-body">
+
+    {% set active_page = 'home' %}
+    {% include 'story_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main">
+        <!-- Hero Banner -->
+        <section class="section home__container container">
+            <div class="home__content">
+                <div>
+                    <span class="home__subtitle">Curated Stories & Editions</span>
+                    <h1 class="home__title">Stories That Stay With You Forever</h1>
+                    <p class="home__description">Explore curated photo books, graphic novels, timeless classics, and hardbound art editions in the AK Story Store.</p>
+                    <div class="home__buttons">
+                        <a href="{{ url_for('story_books') }}" class="button button--flex">Browse Collection &rarr;</a>
+                        <a href="{{ url_for('story_categories') }}" class="button button--ghost">Explore Categories</a>
+                    </div>
+                </div>
+                <img src="{{ url_for('static', filename='images/story-store/about-img.png') }}" alt="AK Story Store" class="home__img">
+            </div>
+        </section>
+
+        <!-- ⚡ Flash Sale Banner Section -->
+        {% if flash_sales %}
+        {% set fs = flash_sales[0] %}
+        <section class="section container" style="margin-bottom:2rem;">
+            <div style="background: linear-gradient(135deg, #e74c3c, #c0392b); border-radius: 1.25rem; padding: 2rem; color: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(231,76,60,0.3); flex-wrap: wrap; gap: 1.5rem;">
+                <div>
+                    <span style="background: #fff; color: #e74c3c; font-weight: 800; font-size: .8rem; padding: .25rem .75rem; border-radius: 1rem; text-transform: uppercase;">⚡ FLASH SALE LIVE</span>
+                    <h2 style="font-size: 1.8rem; margin: .5rem 0 .25rem; color: #fff;">{{ fs.name }} &middot; {{ fs.discount_percent }}% OFF</h2>
+                    <p style="margin: 0; opacity: 0.9; font-size: .95rem;">Limited time offer on select catalog titles! Only a few copies left in stock.</p>
+                </div>
+                <!-- Countdown Timer -->
+                <div style="background: rgba(0,0,0,0.3); padding: .75rem 1.25rem; border-radius: .85rem; border: 1px solid rgba(255,255,255,0.2); text-align: center;">
+                    <div style="font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .25rem;">Ends In</div>
+                    <div id="flashSaleTimer" style="font-size: 1.4rem; font-weight: 800; font-family: monospace; color: #f1c40f;">02:45:18</div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- 🎪 Festival Offers Section -->
+        {% if festival_offers %}
+        {% set fo = festival_offers[0] %}
+        <section class="section container" style="margin-bottom:2rem;">
+            <div style="background: linear-gradient(135deg, #8e44ad, #2980b9); border-radius: 1.25rem; padding: 2rem; color: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(142,68,173,0.3); flex-wrap: wrap; gap: 1.5rem;">
+                <div>
+                    <span style="background: #f1c40f; color: #000; font-weight: 800; font-size: .8rem; padding: .25rem .75rem; border-radius: 1rem;">🎉 FESTIVAL SPECIAL</span>
+                    <h2 style="font-size: 1.8rem; margin: .5rem 0 .25rem; color: #fff;">{{ fo.title }}</h2>
+                    <p style="margin: 0; opacity: 0.9; font-size: .95rem;">{{ fo.description }}</p>
+                </div>
+                <a href="{{ url_for('story_books') }}" class="button" style="background:#fff; color:#8e44ad; font-weight:bold;">Explore Festival Deals &rarr;</a>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- 📖 Continue Reading Progress (Purchased eBooks) -->
+        {% if reading_progress %}
+        <section class="section container" style="margin-bottom:2rem;">
+            <h2 class="section__title" style="text-align:left; margin-bottom:1rem;">📖 Continue Reading</h2>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+                {% for rp in reading_progress %}
+                <div style="background:var(--container-color); border:1px solid var(--card-border); padding:1.25rem; border-radius:1rem; display:flex; gap:1rem; align-items:center;">
+                    <img src="{{ url_for('static', filename=rp.book_image) }}" alt="{{ rp.book_name }}" style="width:55px; height:75px; object-fit:cover; border-radius:.4rem;">
+                    <div style="flex:1;">
+                        <h4 style="margin:0 0 .2rem; color:#fff; font-size:1rem;">{{ rp.book_name }}</h4>
+                        <span style="font-size:.8rem; color:var(--text-color-light);">Page {{ rp.last_page }} of {{ rp.total_pages }} ({{ rp.reading_percentage }}%)</span>
+                        <div style="height:6px; background:rgba(255,255,255,0.1); border-radius:3px; margin:.4rem 0 .6rem; overflow:hidden;">
+                            <div style="height:100%; width:{{ rp.reading_percentage }}%; background:var(--first-color);"></div>
+                        </div>
+                        <a href="{{ url_for('story_book_details', book_id=rp.book_id) }}" style="color:var(--first-color); font-size:.8rem; text-decoration:none; font-weight:600;">Resume Reading &rarr;</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- 📦 Combo Bundles Section -->
+        {% if combo_offers %}
+        <section class="section container" style="margin-bottom:2rem;">
+            <h2 class="section__title">📦 Curated Combo Bundles</h2>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem;">
+                {% for c in combo_offers %}
+                <div style="background:var(--container-color); border:1px solid var(--card-border); border-radius:1rem; padding:1.5rem; display:flex; flex-direction:column; justify:space-between;">
+                    <div>
+                        <span style="background:rgba(241,196,15,0.15); color:#f1c40f; border:1px solid rgba(241,196,15,0.3); padding:.2rem .6rem; border-radius:1rem; font-size:.75rem; font-weight:bold;">SAVE ₹{{ c.savings_amount }}</span>
+                        <h3 style="color:#fff; margin:.75rem 0 .4rem; font-size:1.15rem;">{{ c.name }}</h3>
+                        <p style="color:var(--text-color-light); font-size:.85rem; margin-bottom:1rem;">{{ c.description }}</p>
+                    </div>
+                    <div>
+                        <div style="display:flex; align-items:baseline; gap:.75rem; margin-bottom:1rem;">
+                            <span style="font-size:1.3rem; font-weight:bold; color:#2ecc71;">₹{{ c.combo_price }}</span>
+                            <span style="text-decoration:line-through; color:var(--text-color-light); font-size:.9rem;">₹{{ c.original_price }}</span>
+                        </div>
+                        <form action="{{ url_for('story_cart_add_combo', combo_id=c.id) }}" method="post">
+                            <button type="submit" class="button" style="width:100%; text-align:center; padding:.6rem;">Add Entire Bundle to Cart &rarr;</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- 🔥 Trending Books Section -->
+        <section class="section container">
+            <h2 class="section__title">🔥 Trending Books</h2>
+            <div class="books__container grid">
+                {% for book in trending[:4] %}
+                <article class="book-card">
+                    <span class="book-card__tag" style="background:#e74c3c; color:#fff;">🔥 TRENDING</span>
+                    <img src="{{ url_for('static', filename=book.image) }}" alt="{{ book.name }}" class="book-card__img">
+                    <h3 class="book-card__title">{{ book.name }}</h3>
+                    <p class="book-card__author">By {{ book.author|default('AK Authors') }}</p>
+                    <div class="book-card__footer">
+                        <span class="book-card__price">₹{{ book.price }}</span>
+                        <a href="{{ url_for('story_book_details', book_id=book.id) }}" class="button" style="padding:.5rem 1rem; font-size:.85rem;">View Book</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Featured Books Section -->
+        <section class="section container">
+            <h2 class="section__title">Featured Books</h2>
+            <div class="books__container grid">
+                {% for book in books[:4] %}
+                <article class="book-card">
+                    <span class="book-card__tag">{{ book.category }}</span>
+                    <img src="{{ url_for('static', filename=book.image) }}" alt="{{ book.name }}" class="book-card__img">
+                    <h3 class="book-card__title">{{ book.name }}</h3>
+                    <p class="book-card__author">{{ book.description[:60] }}...</p>
+                    <div class="book-card__footer">
+                        <span class="book-card__price">₹{{ book.price }}</span>
+                        <a href="{{ url_for('story_book_details', book_id=book.id) }}" class="button" style="padding:.5rem 1rem; font-size:.85rem;">View Book</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- 🛍️ Recently Purchased Section -->
+        {% if recently_purchased %}
+        <section class="section container">
+            <h2 class="section__title">🛍️ Recently Purchased by Readers</h2>
+            <div class="books__container grid">
+                {% for book in recently_purchased %}
+                <article class="book-card">
+                    <span class="book-card__tag" style="background:#2ecc71; color:#fff;">✓ RECENTLY BOUGHT</span>
+                    <img src="{{ url_for('static', filename=book.image) }}" alt="{{ book.name }}" class="book-card__img">
+                    <h3 class="book-card__title">{{ book.name }}</h3>
+                    <p class="book-card__author">By {{ book.author|default('AK Authors') }}</p>
+                    <div class="book-card__footer">
+                        <span class="book-card__price">₹{{ book.price }}</span>
+                        <a href="{{ url_for('story_book_details', book_id=book.id) }}" class="button button--ghost" style="padding:.5rem 1rem; font-size:.85rem;">View Book</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'story_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/story-store.js') }}"></script>
+</body>
+</html>

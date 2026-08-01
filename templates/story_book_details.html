@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.name }} | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+</head>
+<body class="story-store-body">
+
+    {% set active_page = 'books' %}
+    {% include 'story_header.html' %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main section container">
+        <!-- Breadcrumb Navigation -->
+        <nav style="margin-bottom:1.5rem; font-size:var(--small-font-size); color:var(--text-color-light);">
+            <a href="{{ url_for('story_home') }}" style="color:var(--text-color);">Home</a> &gt; 
+            <a href="{{ url_for('story_books') }}" style="color:var(--text-color);">Books</a> &gt; 
+            <span>{{ book.category }}</span> &gt; 
+            <span style="color:var(--first-color);">{{ book.name }}</span>
+        </nav>
+
+        <!-- Product Hero Grid -->
+        <div class="book-details-container">
+            <!-- Cover Media with Image Zoom -->
+            <div class="book-media" style="position:relative; overflow:hidden; border-radius:1rem;">
+                <img src="{{ url_for('static', filename=book.image) }}" alt="{{ book.name }}" id="zoomBookImg" style="transition:transform 0.3s ease; cursor:zoom-in;">
+                <span style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.7); color:#fff; font-size:.7rem; padding:.2rem .5rem; border-radius:.3rem;">🔍 Hover to Zoom</span>
+            </div>
+
+            <!-- Info & Actions Column -->
+            <div class="book-info">
+                <div style="display:flex; gap:.5rem; align-items:center; margin-bottom:.5rem;">
+                    <span class="book-card__tag">{{ book.category }}</span>
+                    {% if book.is_bestseller %}<span style="background:#e67e22; color:#fff; font-size:.7rem; padding:.2rem .5rem; border-radius:.25rem; font-weight:bold;">BEST SELLER</span>{% endif %}
+                    {% if book.is_trending %}<span style="background:#8e44ad; color:#fff; font-size:.7rem; padding:.2rem .5rem; border-radius:.25rem; font-weight:bold;">TRENDING</span>{% endif %}
+                </div>
+
+                <h1>{{ book.name }}</h1>
+                <p class="book-author">By <strong>{{ book.author|default('AK Authors') }}</strong> &middot; Publisher: {{ book.publisher|default('AK Publications') }}</p>
+                
+                <!-- Rating Stars & Reviews -->
+                <div style="color:#f39c12; font-size:1.1rem; margin-bottom:1rem;">
+                    ★★★★★ <span style="color:var(--text-color); font-size:var(--small-font-size);">{{ book.rating|default(4.8) }} / 5.0 ({{ book.reviews_count|default(124) }} Customer Reviews)</span>
+                </div>
+
+                <!-- Price Tag & Stock -->
+                <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:1rem;">
+                    <div class="book-price-tag" style="margin:0;">₹{{ book.price }}</div>
+                    {% if book.discount_price > 0 %}
+                    <span style="text-decoration:line-through; color:var(--text-color-light); font-size:1.2rem;">₹{{ book.price + 150 }}</span>
+                    <span style="color:#2ecc71; font-weight:bold; font-size:.9rem;">(Save ₹150)</span>
+                    {% endif %}
+                </div>
+
+                <!-- Stock Availability & Delivery -->
+                <div style="margin-bottom:1.5rem; display:flex; gap:1.5rem; font-size:var(--small-font-size);">
+                    <div>Status: <strong style="color:{% if book.stock > 0 %}#2ecc71{% else %}#e74c3c{% endif %};">{% if book.stock > 0 %}✓ In Stock ({{ book.stock }} copies){% else %}✕ Out of Stock{% endif %}</strong></div>
+                    <div>Delivery: <strong style="color:var(--title-color);">🚚 5 - 7 Business Days</strong></div>
+                </div>
+
+                <!-- Description -->
+                <p class="book-description" style="margin-bottom:1.5rem;">
+                    {{ book.description }}
+                </p>
+
+                <!-- Metadata Table Grid -->
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:.75rem; background:rgba(0,0,0,0.3); border:1px solid var(--card-border); padding:1rem; border-radius:.75rem; margin-bottom:1.5rem; font-size:var(--small-font-size);">
+                    <div><strong>Genre:</strong> {{ book.genre|default('Fiction') }}</div>
+                    <div><strong>Language:</strong> {{ book.language|default('English') }}</div>
+                    <div><strong>ISBN:</strong> {{ book.isbn|default('978-0-123456-78-9') }}</div>
+                    <div><strong>Pages:</strong> {{ book.pages|default(350) }} pages</div>
+                </div>
+
+                <!-- Action Buttons: Add to Cart & Buy Now -->
+                <div style="display:flex; flex-wrap:wrap; gap:1rem; align-items:center;">
+                    <form action="{{ url_for('story_cart_add') }}" method="post" style="display:flex; gap:1rem; align-items:center;">
+                        <input type="hidden" name="book_id" value="{{ book.id }}">
+                        <div class="qty-control-group">
+                            <button type="button" class="qty-btn" onclick="const input = this.parentNode.querySelector('input'); input.value = Math.max(1, parseInt(input.value) - 1);">-</button>
+                            <input type="number" name="quantity" value="1" min="1" class="qty-input" readonly>
+                            <button type="button" class="qty-btn" onclick="const input = this.parentNode.querySelector('input'); input.value = parseInt(input.value) + 1;">+</button>
+                        </div>
+                        <button type="submit" class="button">Add to Cart &rarr;</button>
+                    </form>
+
+                    <!-- Buy Now Button (Direct Checkout Flow) -->
+                    <form action="{{ url_for('story_buy_now', book_id=book.id) }}" method="post" style="margin:0;">
+                        <button type="submit" class="button" style="background:#e67e22;">⚡ Buy Now</button>
+                    </form>
+
+                    <!-- Wishlist & Share -->
+                    <button type="button" onclick="toggleWishlist('{{ book.id }}', this);" class="button button--ghost" style="padding:.75rem 1rem;">
+                        ❤️ Wishlist
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Customer Reviews Section -->
+        <section class="section" style="padding-top:3rem; border-top:1px solid var(--card-border); margin-top:3rem;">
+            <h2 class="section__title">Customer Reviews & Ratings</h2>
+
+            <!-- Rating Summary Breakdown Grid -->
+            <div style="display:grid; grid-template-columns: 1fr 2fr; gap:2rem; background:var(--container-color); border:1px solid var(--card-border); padding:2rem; border-radius:1rem; margin-bottom:2rem; align-items:center;">
+                <!-- Average Rating Card -->
+                <div style="text-align:center; padding-right:1.5rem; border-right:1px solid var(--card-border);">
+                    <div style="font-size:3.5rem; font-weight:800; color:#fff; line-height:1;">{{ avg_rating|default(4.8) }}</div>
+                    <div style="color:#f1c40f; font-size:1.4rem; margin:.4rem 0;">★★★★★</div>
+                    <div style="font-size:.85rem; color:var(--text-color-light);">Based on {{ reviews_list|length }} Customer Reviews</div>
+                </div>
+
+                <!-- Star Rating Percentage Bars -->
+                <div>
+                    {% for star in [5, 4, 3, 2, 1] %}
+                    <div style="display:flex; align-items:center; gap:1rem; margin-bottom:.5rem; font-size:.85rem;">
+                        <span style="width:30px; color:#fff;">{{ star }} ★</span>
+                        <div style="flex:1; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden;">
+                            <div style="height:100%; width: {{ (star_counts[star] / (reviews_list|length if reviews_list else 1) * 100)|round }}%; background:var(--first-color); border-radius:4px;"></div>
+                        </div>
+                        <span style="width:40px; color:var(--text-color-light); text-align:right;">{{ star_counts[star] }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Submit Review Form -->
+            <div style="background:var(--container-color); border:1px solid var(--card-border); padding:1.75rem; border-radius:1rem; margin-bottom:2.5rem;">
+                <h3 style="color:#fff; margin:0 0 1rem; font-size:1.1rem;">Write a Product Review</h3>
+                <form action="{{ url_for('story_submit_review', book_id=book.id) }}" method="post">
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-size:.85rem; color:#fff; margin-bottom:.35rem;">Select Rating *</label>
+                        <select name="rating" required style="background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#f1c40f; padding:.6rem 1rem; border-radius:.5rem; font-size:1rem;">
+                            <option value="5">★★★★★ (5 Stars - Excellent)</option>
+                            <option value="4">★★★★☆ (4 Stars - Very Good)</option>
+                            <option value="3">★★★☆☆ (3 Stars - Average)</option>
+                            <option value="2">★★☆☆☆ (2 Stars - Below Average)</option>
+                            <option value="1">★☆☆☆☆ (1 Star - Poor)</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom:1rem;">
+                        <label style="display:block; font-size:.85rem; color:#fff; margin-bottom:.35rem;">Review Headline / Title *</label>
+                        <input type="text" name="review_title" placeholder="Summarize your experience..." required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                    </div>
+
+                    <div style="margin-bottom:1.25rem;">
+                        <label style="display:block; font-size:.85rem; color:#fff; margin-bottom:.35rem;">Detailed Review *</label>
+                        <textarea name="review_text" rows="3" placeholder="What did you like or dislike about this book?" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;"></textarea>
+                    </div>
+
+                    <button type="submit" class="button">Submit Review for Verification &rarr;</button>
+                </form>
+            </div>
+
+            <!-- Customer Reviews List -->
+            <div style="display:grid; gap:1.25rem;">
+                <h3 style="color:#fff; margin:0 0 .5rem;">Customer Reviews ({{ reviews_list|length }})</h3>
+                {% if reviews_list %}
+                {% for r in reviews_list %}
+                <div style="background:var(--container-color); border:1px solid var(--card-border); padding:1.5rem; border-radius:.85rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:.5rem;">
+                        <div>
+                            <strong style="color:#fff; font-size:1rem;">{{ r.customer_name }}</strong>
+                            {% if r.is_verified_purchase %}
+                            <span style="background:rgba(46,204,113,0.15); color:#2ecc71; border:1px solid rgba(46,204,113,0.3); padding:.15rem .5rem; border-radius:1rem; font-size:.75rem; margin-left:.5rem; font-weight:600;">✔ Verified Purchase</span>
+                            {% endif %}
+                        </div>
+                        <span style="font-size:.8rem; color:var(--text-color-light);">{{ r.review_date }}</span>
+                    </div>
+
+                    <div style="color:#f1c40f; margin-bottom:.5rem; font-size:.9rem;">
+                        {% for i in range(r.rating) %}★{% endfor %}{% for i in range(5 - r.rating) %}☆{% endfor %}
+                    </div>
+
+                    <h4 style="margin:0 0 .35rem; color:#fff; font-size:.95rem;">{{ r.review_title }}</h4>
+                    <p style="margin:0 0 .85rem; color:var(--text-color); font-size:.9rem; line-height:1.5;">{{ r.review_text }}</p>
+
+                    {% if r.admin_reply %}
+                    <div style="background:rgba(255,72,32,0.1); border-left:3px solid var(--first-color); padding:.6rem .8rem; margin-bottom:.85rem; border-radius:0 .4rem .4rem 0;">
+                        <strong style="color:var(--first-color); font-size:.85rem;">Store Admin Reply:</strong>
+                        <p style="margin:.2rem 0 0; font-size:.85rem; color:#fff;">{{ r.admin_reply }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Review Actions: Helpful Vote & Report Abuse -->
+                    <div style="display:flex; gap:1rem; align-items:center;">
+                        <button type="button" onclick="voteHelpful({{ r.id }}, this);" style="background:rgba(255,255,255,0.06); color:#fff; border:1px solid var(--card-border); padding:.3rem .75rem; border-radius:.4rem; font-size:.8rem; cursor:pointer;">
+                            👍 Helpful (<span class="helpful-count">{{ r.helpful_count }}</span>)
+                        </button>
+
+                        <button type="button" onclick="reportAbuse({{ r.id }});" style="background:transparent; color:#888; border:none; font-size:.8rem; cursor:pointer;">
+                            🚩 Report Abuse
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color:var(--text-color-light);">No customer reviews approved yet for this book. Be the first to leave a review!</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Smart Recommendations: You May Also Like -->
+        {% if related_genre %}
+        <section class="section" style="padding-top:4rem;">
+            <h2 class="section__title">You May Also Like (Same Genre)</h2>
+            <div class="books__container grid">
+                {% for b in related_genre %}
+                <article class="book-card">
+                    <span class="book-card__tag">{{ b.category }}</span>
+                    <img src="{{ url_for('static', filename=b.image) }}" alt="{{ b.name }}" class="book-card__img">
+                    <h3 class="book-card__title">{{ b.name }}</h3>
+                    <p class="book-card__author">By {{ b.author|default('AK Authors') }}</p>
+                    <div class="book-card__footer">
+                        <span class="book-card__price">₹{{ b.price }}</span>
+                        <a href="{{ url_for('story_book_details', book_id=b.id) }}" class="button" style="padding:.4rem .8rem; font-size:.8rem;">View Book</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Recently Viewed Section -->
+        {% if recently_books %}
+        <section class="section" style="padding-top:2rem;">
+            <h2 class="section__title">Recently Viewed Books</h2>
+            <div class="books__container grid">
+                {% for b in recently_books %}
+                <article class="book-card">
+                    <span class="book-card__tag">{{ b.category }}</span>
+                    <img src="{{ url_for('static', filename=b.image) }}" alt="{{ b.name }}" class="book-card__img">
+                    <h3 class="book-card__title">{{ b.name }}</h3>
+                    <p class="book-card__author">By {{ b.author|default('AK Authors') }}</p>
+                    <div class="book-card__footer">
+                        <span class="book-card__price">₹{{ b.price }}</span>
+                        <a href="{{ url_for('story_book_details', book_id=b.id) }}" class="button button--ghost" style="padding:.4rem .8rem; font-size:.8rem;">View Book</a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    {% include 'story_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/story-store.js') }}"></script>
+    <script>
+        // Image Zoom Hover Effect
+        const zoomImg = document.getElementById('zoomBookImg');
+        if (zoomImg) {
+            zoomImg.addEventListener('mousemove', function(e) {
+                const { left, top, width, height } = this.getBoundingClientRect();
+                const x = (e.clientX - left) / width * 100;
+                const y = (e.clientY - top) / height * 100;
+                this.style.transformOrigin = `${x}% ${y}%`;
+                this.style.transform = 'scale(1.8)';
+            });
+            zoomImg.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+
+        // Helpful Vote AJAX Handler
+        function voteHelpful(reviewId, btn) {
+            fetch(`/story-store/api/review/${reviewId}/helpful`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const span = btn.querySelector('.helpful-count');
+                    if (span) span.innerText = data.helpful_count;
+                    btn.style.color = '#2ecc71';
+                } else {
+                    alert(data.message || 'Error processing vote.');
+                }
+            })
+            .catch(() => alert('Failed to connect to server.'));
+        }
+
+        // Report Abuse AJAX Handler
+        function reportAbuse(reviewId) {
+            const reason = prompt('Please specify reason for reporting abuse (Spam, Abusive Language, Fake Review, Offensive Content, Other):', 'Spam');
+            if (reason) {
+                fetch(`/story-store/api/review/${reviewId}/report`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason: reason })
+                })
+                .then(res => res.json())
+                .then(data => alert(data.message || 'Report submitted successfully.'))
+                .catch(() => alert('Failed to submit abuse report.'));
+            }
+        }
+    </script>
+</body>
+</html>

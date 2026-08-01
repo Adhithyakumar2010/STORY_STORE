@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="story-store-body" style="background-color: #161713; color: #fff; min-height: 100vh; display: flex; flex-direction: column;">
+
+    {% set active_page = 'notifications' %}
+    {% include 'story_header.html' %}
+
+    <main class="main section container" style="flex: 1; padding-top: 5.5rem; padding-bottom: 4rem;">
+        <div style="max-width: 850px; margin: 0 auto;">
+            <!-- Title Bar & Actions -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1 class="section__title" style="margin: 0 0 .25rem; text-align: left; font-size: 1.8rem;">Notification Center</h1>
+                    <span style="color: var(--text-color-light); font-size: .9rem;">Stay updated on your orders, delivery status, and festival offers</span>
+                </div>
+                <div style="display: flex; gap: .75rem;">
+                    <form action="{{ url_for('story_notifications_mark_all_read') }}" method="post">
+                        <button type="submit" style="background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); padding: .5rem 1rem; border-radius: .6rem; font-size: .85rem; font-weight: 600; cursor: pointer;">✓ Mark All Read</button>
+                    </form>
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div style="margin-bottom: 1.5rem;">
+                {% for category, message in messages %}
+                <div style="background: rgba(46,204,113,0.15); border: 1px solid #2ecc71; color: #2ecc71; padding: .85rem 1.25rem; border-radius: .75rem; font-size: .9rem;">
+                    ✓ {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <!-- Category Filter Tabs -->
+            <div style="display: flex; gap: .5rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: .75rem; overflow-x: auto;">
+                <a href="{{ url_for('story_notifications') }}" style="color: {% if not current_cat %}var(--first-color){% else %}var(--text-color-light){% endif %}; font-size: .85rem; font-weight: bold; text-decoration: none; padding: .3rem .8rem; border-radius: .4rem; background: {% if not current_cat %}rgba(255,72,32,0.15){% else %}transparent{% endif %};">All Notifications</a>
+                <a href="{{ url_for('story_notifications', cat='order') }}" style="color: {% if current_cat=='order' %}var(--first-color){% else %}var(--text-color-light){% endif %}; font-size: .85rem; font-weight: bold; text-decoration: none; padding: .3rem .8rem; border-radius: .4rem;">📦 Orders</a>
+                <a href="{{ url_for('story_notifications', cat='delivery') }}" style="color: {% if current_cat=='delivery' %}var(--first-color){% else %}var(--text-color-light){% endif %}; font-size: .85rem; font-weight: bold; text-decoration: none; padding: .3rem .8rem; border-radius: .4rem;">🚚 Delivery</a>
+                <a href="{{ url_for('story_notifications', cat='offer') }}" style="color: {% if current_cat=='offer' %}var(--first-color){% else %}var(--text-color-light){% endif %}; font-size: .85rem; font-weight: bold; text-decoration: none; padding: .3rem .8rem; border-radius: .4rem;">🎉 Offers</a>
+                <a href="{{ url_for('story_notifications', cat='wishlist') }}" style="color: {% if current_cat=='wishlist' %}var(--first-color){% else %}var(--text-color-light){% endif %}; font-size: .85rem; font-weight: bold; text-decoration: none; padding: .3rem .8rem; border-radius: .4rem;">❤️ Wishlist</a>
+            </div>
+
+            <!-- Notifications Feed Cards -->
+            <div style="display: grid; gap: 1rem;">
+                {% if notifications %}
+                {% for n in notifications %}
+                <div style="background: rgba(30, 31, 26, 0.95); border: 1px solid {% if not n.is_read %}var(--first-color){% else %}rgba(255, 255, 255, 0.08){% endif %}; border-radius: 1rem; padding: 1.25rem; display: flex; gap: 1.25rem; align-items: start; transition: .3s;">
+                    <div style="font-size: 1.8rem; background: rgba(0,0,0,0.4); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        {{ n.icon|default('🔔') }}
+                    </div>
+
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: .3rem;">
+                            <strong style="color: #fff; font-size: 1.05rem;">{{ n.title }}</strong>
+                            <span style="color: var(--text-color-light); font-size: .78rem;">{{ n.created_at }}</span>
+                        </div>
+                        <p style="margin: 0 0 .6rem; color: var(--text-color); font-size: .9rem; line-height: 1.4;">{{ n.message }}</p>
+                        {% if n.link %}
+                        <a href="{{ n.link }}" style="color: var(--first-color); font-size: .82rem; text-decoration: none; font-weight: 600;">View Details &rarr;</a>
+                        {% endif %}
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: .4rem;">
+                        {% if not n.is_read %}
+                        <form action="{{ url_for('story_notification_mark_read', notif_id=n.id) }}" method="post">
+                            <button type="submit" title="Mark as Read" style="background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); padding: .25rem .5rem; border-radius: .4rem; font-size: .75rem; cursor: pointer;">Mark Read</button>
+                        </form>
+                        {% endif %}
+                        <form action="{{ url_for('story_notification_delete', notif_id=n.id) }}" method="post">
+                            <button type="submit" title="Delete Notification" style="background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); padding: .25rem .5rem; border-radius: .4rem; font-size: .75rem; cursor: pointer;">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div style="text-align: center; padding: 3.5rem 1rem; background: rgba(30, 31, 26, 0.95); border-radius: 1rem; color: var(--text-color-light);">
+                    <div style="font-size: 2.5rem; margin-bottom: .5rem;">🔔</div>
+                    <p>No notifications found. All caught up!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    {% include 'story_footer.html' %}
+
+</body>
+</html>

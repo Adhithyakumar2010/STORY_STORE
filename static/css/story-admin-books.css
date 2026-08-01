@@ -1,0 +1,70 @@
+/* STORY STORE ADMIN BOOKS & TABLES STYLESHEET */
+.badge-stock {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .25rem .65rem;
+    border-radius: 2rem;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.badge-in-stock {
+    background: rgba(46, 204, 113, 0.15);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.badge-low-stock {
+    background: rgba(243, 156, 18, 0.15);
+    color: #f39c12;
+    border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+.badge-out-stock {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+.book-thumb {
+    width: 48px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: .4rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.action-btn-group {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.btn-sm {
+    padding: .35rem .75rem;
+    border-radius: .4rem;
+    font-size: .8rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.btn-edit {
+    background: rgba(52, 152, 219, 0.15);
+    color: #3498db;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+.btn-edit:hover {
+    background: rgba(52, 152, 219, 0.3);
+}
+
+.btn-delete {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+.btn-delete:hover {
+    background: rgba(231, 76, 60, 0.3);
+}

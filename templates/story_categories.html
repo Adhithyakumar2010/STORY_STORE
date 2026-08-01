@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+</head>
+<body class="story-store-body">
+
+    {% set active_page = 'categories' %}
+    {% include 'story_header.html' %}
+
+    <main class="main section container">
+        <div style="margin-bottom: 2rem;">
+            <a href="{{ url_for('story_books') }}" class="continue-shopping-link">&larr; Return to All Books</a>
+        </div>
+
+        <h1 class="section__title">Book Categories</h1>
+
+        <div class="category__container grid">
+            <a href="{{ url_for('story_books') }}" class="category-card">
+                <img src="{{ url_for('static', filename='images/story-store/category1-img.jpg') }}" alt="Fiction" class="category-card__img">
+                <h2 class="category-card__title">Fiction & Novels</h2>
+                <p style="color:var(--text-color-light); font-size:var(--small-font-size);">Captivating narratives & classics</p>
+            </a>
+            <a href="{{ url_for('story_books') }}" class="category-card">
+                <img src="{{ url_for('static', filename='images/story-store/category2-img.jpg') }}" alt="Graphic Novels" class="category-card__img">
+                <h2 class="category-card__title">Graphic Novels</h2>
+                <p style="color:var(--text-color-light); font-size:var(--small-font-size);">Visual comics & series</p>
+            </a>
+            <a href="{{ url_for('story_books') }}" class="category-card">
+                <img src="{{ url_for('static', filename='images/story-store/category3-img.jpg') }}" alt="Art & Photography" class="category-card__img">
+                <h2 class="category-card__title">Art & Photography</h2>
+                <p style="color:var(--text-color-light); font-size:var(--small-font-size);">Collector albums & visual stories</p>
+            </a>
+        </div>
+    </main>
+
+    {% include 'story_footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/story-store.js') }}"></script>
+</body>
+</html>

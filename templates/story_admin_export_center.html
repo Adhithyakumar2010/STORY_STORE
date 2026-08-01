@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Export Center</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_analytics') }}" class="sidebar-link"><span class="icon">📈</span> <span>Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_best_sellers') }}" class="sidebar-link"><span class="icon">⭐</span> <span>Best Sellers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_least_sellers') }}" class="sidebar-link"><span class="icon">📉</span> <span>Least Sellers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_categories') }}" class="sidebar-link"><span class="icon">🏷️</span> <span>Categories</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_publishers') }}" class="sidebar-link"><span class="icon">🏢</span> <span>Publishers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_authors') }}" class="sidebar-link"><span class="icon">🖋️</span> <span>Authors</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_genres') }}" class="sidebar-link"><span class="icon">🎭</span> <span>Genres</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_coupons') }}" class="sidebar-link"><span class="icon">🎟️</span> <span>Coupons</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_inventory') }}" class="sidebar-link"><span class="icon">📦</span> <span>Inventory</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_orders') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Orders</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_customers') }}" class="sidebar-link"><span class="icon">👥</span> <span>Customers</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reports_monthly') }}" class="sidebar-link"><span class="icon">📅</span> <span>Monthly Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_reports_yearly') }}" class="sidebar-link"><span class="icon">📊</span> <span>Yearly Reports</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_revenue') }}" class="sidebar-link"><span class="icon">💰</span> <span>Revenue Stats</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_customer_analytics') }}" class="sidebar-link"><span class="icon">👤</span> <span>Customer Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_export_center') }}" class="sidebar-link active"><span class="icon">📥</span> <span>Export Center</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_settings') }}" class="sidebar-link"><span class="icon">⚙️</span> <span>Settings</span></a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout"><span>🚪</span> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Data Export Center (PDF & Excel)</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; align-items:start;">
+                    <!-- PDF Reports Section -->
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1.25rem;">📄 ReportLab PDF Reports</h3>
+                        <p style="color:var(--text-muted); font-size:.88rem; margin-bottom:1.5rem;">Generate and download publication-ready PDF documents formatted with header branding, summary tables, and page numbers.</p>
+                        <div style="display:flex; flex-direction:column; gap:.85rem;">
+                            <a href="{{ url_for('story_admin_pdf_report', report_type='sales') }}" class="topbar-btn" style="background:#e74c3c; border-color:#e74c3c; justify-content:center;">Download Sales PDF Report</a>
+                            <a href="{{ url_for('story_admin_pdf_report', report_type='revenue') }}" class="topbar-btn" style="background:#e74c3c; border-color:#e74c3c; justify-content:center;">Download Revenue PDF Report</a>
+                            <a href="{{ url_for('story_admin_pdf_report', report_type='inventory') }}" class="topbar-btn" style="background:#e74c3c; border-color:#e74c3c; justify-content:center;">Download Inventory PDF Report</a>
+                            <a href="{{ url_for('story_admin_pdf_report', report_type='customers') }}" class="topbar-btn" style="background:#e74c3c; border-color:#e74c3c; justify-content:center;">Download Customers PDF Report</a>
+                            <a href="{{ url_for('story_admin_pdf_report', report_type='orders') }}" class="topbar-btn" style="background:#e74c3c; border-color:#e74c3c; justify-content:center;">Download Orders PDF Report</a>
+                            <a href="{{ url_for('story_admin_pdf_report', report_type='books') }}" class="topbar-btn" style="background:#e74c3c; border-color:#e74c3c; justify-content:center;">Download Books Catalog PDF Report</a>
+                        </div>
+                    </div>
+
+                    <!-- Excel Exports Section -->
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1.25rem;">📊 OpenPyXL Excel Exports (.xlsx)</h3>
+                        <p style="color:var(--text-muted); font-size:.88rem; margin-bottom:1.5rem;">Export raw database records and business metrics directly to Microsoft Excel spreadsheets for detailed offline analysis.</p>
+                        <div style="display:flex; flex-direction:column; gap:.85rem;">
+                            <a href="{{ url_for('story_admin_excel_export', data_type='sales') }}" class="topbar-btn" style="background:#2ecc71; border-color:#2ecc71; justify-content:center;">Export Sales Data (.xlsx)</a>
+                            <a href="{{ url_for('story_admin_excel_export', data_type='orders') }}" class="topbar-btn" style="background:#2ecc71; border-color:#2ecc71; justify-content:center;">Export Orders Data (.xlsx)</a>
+                            <a href="{{ url_for('story_admin_excel_export', data_type='revenue') }}" class="topbar-btn" style="background:#2ecc71; border-color:#2ecc71; justify-content:center;">Export Revenue Data (.xlsx)</a>
+                            <a href="{{ url_for('story_admin_excel_export', data_type='customers') }}" class="topbar-btn" style="background:#2ecc71; border-color:#2ecc71; justify-content:center;">Export Customers Data (.xlsx)</a>
+                            <a href="{{ url_for('story_admin_excel_export', data_type='inventory') }}" class="topbar-btn" style="background:#2ecc71; border-color:#2ecc71; justify-content:center;">Export Inventory Data (.xlsx)</a>
+                            <a href="{{ url_for('story_admin_excel_export', data_type='books') }}" class="topbar-btn" style="background:#2ecc71; border-color:#2ecc71; justify-content:center;">Export Books Catalog (.xlsx)</a>
+                            <a href="{{ url_for('story_admin_excel_export', data_type='coupons') }}" class="topbar-btn" style="background:#2ecc71; border-color:#2ecc71; justify-content:center;">Export Coupons Data (.xlsx)</a>
+                            <a href="{{ url_for('story_admin_excel_export', data_type='discounts') }}" class="topbar-btn" style="background:#2ecc71; border-color:#2ecc71; justify-content:center;">Export Discounts Data (.xlsx)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

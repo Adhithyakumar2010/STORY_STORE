@@ -1,0 +1,110 @@
+/*=============== STORY ORDERS & SUCCESS STYLES ===============*/
+.order-success-wrapper {
+    padding: 4rem 0;
+}
+
+.order-success-card {
+    background: var(--container-color);
+    border: 1px solid var(--card-border);
+    padding: 3.5rem 2.5rem;
+    border-radius: 1.5rem;
+    text-align: center;
+    max-width: 750px;
+    margin: 0 auto;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+}
+
+.success-icon-animated {
+    width: 85px;
+    height: 85px;
+    background: rgba(39, 174, 96, 0.2);
+    border: 3px solid #2ecc71;
+    color: #2ecc71;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.75rem;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 0 30px rgba(46, 204, 113, 0.4);
+    animation: floating 3s ease-in-out infinite;
+}
+
+.order-details-box {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--card-border);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: left;
+    margin: 2rem 0;
+}
+
+.order-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.detail-group label {
+    font-size: var(--smaller-font-size);
+    color: var(--text-color-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: .25rem;
+}
+
+.detail-group p {
+    color: var(--title-color);
+    font-weight: var(--font-semi-bold);
+    font-size: var(--normal-font-size);
+}
+
+.ordered-books-list {
+    margin-top: 1rem;
+}
+
+.ordered-book-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ordered-book-item:last-child {
+    border-bottom: none;
+}
+
+.order-actions-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-pdf-download {
+    background: #27ae60;
+    color: white;
+    padding: .85rem 1.75rem;
+    border-radius: .5rem;
+    font-weight: var(--font-semi-bold);
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+}
+
+.btn-pdf-download:hover {
+    background: #219653;
+    transform: translateY(-2px);
+}
+
+@media(max-width: 600px) {
+    .order-details-grid { grid-template-columns: 1fr; }
+    .order-actions-row { flex-direction: column; }
+}

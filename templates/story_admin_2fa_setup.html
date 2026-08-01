@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Factor Authentication Setup | AK STORY STORE ADMIN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-books.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_security') }}" class="sidebar-link active"><span class="icon">🛡️</span> <span>Security Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_notifications') }}" class="sidebar-link"><span class="icon">🔔</span> <span>Notifications</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_delivery') }}" class="sidebar-link"><span class="icon">🚚</span> <span>Delivery Management</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_email_settings') }}" class="sidebar-link"><span class="icon">📧</span> <span>Email Settings</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_orders') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Orders</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">TOTP Two-Factor Authentication (2FA) Setup</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_security') }}" class="topbar-btn">&larr; Back to Security</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="content-card" style="max-width:750px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <div>
+                            <h3 style="color:#fff; margin:0 0 .3rem;">Authenticator App Setup</h3>
+                            <p style="color:var(--text-muted); font-size:.88rem; margin:0;">Compatible with Google Authenticator, Microsoft Authenticator, Authy, and 1Password.</p>
+                        </div>
+                        {% if is_enabled %}
+                        <span style="background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid #2ecc71; padding:.3rem .75rem; border-radius:1rem; font-weight:bold; font-size:.8rem;">✓ 2FA ENABLED</span>
+                        {% else %}
+                        <span style="background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid #e74c3c; padding:.3rem .75rem; border-radius:1rem; font-weight:bold; font-size:.8rem;">DISABLED</span>
+                        {% endif %}
+                    </div>
+
+                    {% if not is_enabled %}
+                    <!-- Step 1: Secret Key & QR Code Display -->
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); padding:1.5rem; border-radius:.75rem; margin-bottom:1.5rem; text-align:center;">
+                        <div style="margin-bottom:1rem;">
+                            <span style="font-size:.85rem; color:var(--text-muted); display:block; margin-bottom:.5rem;">1. Scan QR Code or copy Secret Key into your Authenticator App:</span>
+                            <div style="background:#fff; padding:1rem; display:inline-block; border-radius:.5rem; margin-bottom:1rem;">
+                                <img src="data:image/png;base64,{{ qr_code_b64 }}" alt="2FA QR Code" style="width:160px; height:160px; display:block;">
+                            </div>
+                        </div>
+
+                        <div style="background:rgba(255,255,255,0.05); padding:.75rem 1rem; border-radius:.5rem; display:inline-flex; align-items:center; gap:1rem;">
+                            <span style="font-family:monospace; font-size:1.2rem; font-weight:bold; color:var(--first-color); letter-spacing:2px;">{{ secret_key }}</span>
+                            <button type="button" onclick="navigator.clipboard.writeText('{{ secret_key }}'); alert('Secret key copied!');" style="background:rgba(255,255,255,0.1); color:#fff; border:none; padding:.3rem .6rem; border-radius:.3rem; font-size:.75rem; cursor:pointer;">Copy Key</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Verify TOTP Code to Enable -->
+                    <form action="{{ url_for('story_admin_2fa_setup') }}" method="post" style="display:grid; gap:1rem;">
+                        <input type="hidden" name="secret_key" value="{{ secret_key }}">
+                        <div>
+                            <label style="display:block; color:#fff; font-size:.85rem; margin-bottom:.35rem;">2. Enter 6-digit TOTP Code from your Authenticator App to Enable *</label>
+                            <input type="text" name="totp_code" placeholder="• • • • • •" required maxlength="6" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.6); border:1px solid var(--card-border); color:var(--first-color); padding:.75rem 1rem; border-radius:.5rem; font-size:1.3rem; font-weight:bold; text-align:center; letter-spacing:4px;">
+                        </div>
+                        <button type="submit" class="button" style="background:var(--first-color); color:#fff; border:none; padding:.75rem; border-radius:.5rem; font-weight:bold; cursor:pointer;">Enable 2FA & Generate Recovery Codes &rarr;</button>
+                    </form>
+                    {% else %}
+                    <!-- Display Recovery Codes if Enabled -->
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); padding:1.5rem; border-radius:.75rem; margin-bottom:1.5rem;">
+                        <h4 style="color:#fff; margin:0 0 .5rem;">🔑 10 Single-Use Emergency Recovery Codes</h4>
+                        <p style="color:var(--text-muted); font-size:.85rem; margin:0 0 1rem;">Save or print these codes. You can use any code once if you lose access to your authenticator app.</p>
+                        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:.5rem; font-family:monospace; background:rgba(0,0,0,0.5); padding:1rem; border-radius:.5rem; margin-bottom:1rem;">
+                            {% for c in recovery_codes %}
+                            <div style="color:var(--first-color); font-weight:bold; font-size:1rem;">{{ c.code_plain|default('USED') }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <form action="{{ url_for('story_admin_2fa_disable') }}" method="post" onsubmit="return confirm('Are you sure you want to disable 2FA?');">
+                        <button type="submit" style="background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid #e74c3c; padding:.6rem 1.25rem; border-radius:.5rem; font-weight:bold; cursor:pointer;">Disable 2FA Protection</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Settings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link">
+                        <span class="icon">📊</span> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_books') }}" class="sidebar-link">
+                        <span class="icon">📚</span> <span>Books Catalog</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_categories') }}" class="sidebar-link">
+                        <span class="icon">🏷️</span> <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_orders') }}" class="sidebar-link">
+                        <span class="icon">📦</span> <span>Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_customers') }}" class="sidebar-link">
+                        <span class="icon">👥</span> <span>Customers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_reports') }}" class="sidebar-link">
+                        <span class="icon">📈</span> <span>Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_settings') }}" class="sidebar-link active">
+                        <span class="icon">⚙️</span> <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Story Store Configuration Settings</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="content-card">
+                    <form action="{{ url_for('story_admin_settings') }}" method="post">
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Store Name</label>
+                                <input type="text" name="store_name" value="{{ settings.store_name|default('AK Story Store') }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Currency</label>
+                                <input type="text" name="currency" value="{{ settings.currency|default('₹ (INR)') }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Delivery Charge (₹)</label>
+                                <input type="number" name="delivery_charge" value="{{ settings.delivery_charge|default(0) }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Tax (%)</label>
+                                <input type="number" name="tax_percent" value="{{ settings.tax_percent|default(0) }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end;">
+                            <button type="submit" class="topbar-btn" style="background:var(--first-color); padding:.75rem 1.75rem; font-weight:600;">Save Settings &rarr;</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

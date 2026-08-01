@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Submitted Reviews | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="story-store-body" style="background-color: #161713; color: #fff; min-height: 100vh; display: flex; flex-direction: column;">
+
+    {% set active_page = 'reviews' %}
+    {% include 'story_header.html' %}
+
+    <!-- Main Container -->
+    <main class="main section container" style="flex: 1; padding-top: 5.5rem; padding-bottom: 4rem;">
+
+        <!-- Header Title & Description -->
+        <div style="margin-bottom: 2.5rem; text-align: center;">
+            <h1 class="section__title" style="margin-bottom: .5rem; font-size: 2rem;">My Book Reviews</h1>
+            <p style="color: var(--text-color-light); font-size: .95rem; max-width: 600px; margin: 0 auto;">
+                Manage and track all product reviews you have submitted across the AK Story Store catalog.
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="max-width: 850px; margin: 0 auto 2rem;">
+            {% for category, message in messages %}
+            <div style="background: rgba(46,204,113,0.15); border: 1px solid #2ecc71; color: #2ecc71; padding: .85rem 1.25rem; border-radius: .75rem; font-size: .9rem;">
+                ✓ {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <div style="max-width: 850px; margin: 0 auto; display: grid; gap: 1.5rem;">
+            {% if my_reviews %}
+            {% for r in my_reviews %}
+            <div style="background: rgba(30, 31, 26, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; padding: 1.75rem; display: flex; gap: 1.5rem; align-items: start; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transition: transform 0.2s ease, border-color 0.2s ease;">
+
+                <!-- Book Cover Thumbnail -->
+                <a href="{{ url_for('story_book_details', book_id=r.product_id) }}" style="flex-shrink: 0;">
+                    <img src="{{ url_for('static', filename=r.book_image) }}" alt="{{ r.book_name }}" style="width: 85px; height: 120px; object-fit: cover; border-radius: .6rem; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                </a>
+
+                <!-- Review Content Details -->
+                <div style="flex: 1; min-width: 0;">
+
+                    <!-- Top Bar: Book Title & Date -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: .6rem; flex-wrap: wrap;">
+                        <a href="{{ url_for('story_book_details', book_id=r.product_id) }}" style="text-decoration: none;">
+                            <h3 style="margin: 0; color: #fff; font-size: 1.2rem; font-weight: 600;">{{ r.book_name }}</h3>
+                        </a>
+                        <span style="font-size: .8rem; color: var(--text-color-light); background: rgba(255,255,255,0.05); padding: .25rem .65rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.08);">
+                            📅 {{ r.review_date }}
+                        </span>
+                    </div>
+
+                    <!-- Badges Row: Rating, Verified Purchase, Status -->
+                    <div style="display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin-bottom: .85rem;">
+                        <!-- Star Rating -->
+                        <div style="background: rgba(241, 196, 15, 0.15); border: 1px solid rgba(241, 196, 15, 0.3); color: #f1c40f; padding: .25rem .65rem; border-radius: 1rem; font-size: .85rem; font-weight: 600; display: flex; align-items: center; gap: .3rem;">
+                            ★ {{ r.rating }}.0 / 5.0
+                        </div>
+
+                        <!-- Verified Purchase Badge -->
+                        {% if r.is_verified_purchase %}
+                        <div style="background: rgba(46, 204, 113, 0.15); border: 1px solid rgba(46, 204, 113, 0.3); color: #2ecc71; padding: .25rem .65rem; border-radius: 1rem; font-size: .8rem; font-weight: 600;">
+                            ✔ Verified Purchase
+                        </div>
+                        {% endif %}
+
+                        <!-- Status Badge -->
+                        <div>
+                            {% if r.status == 'Approved' %}
+                            <span style="background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; padding: .25rem .65rem; border-radius: 1rem; font-size: .8rem; font-weight: 600;">
+                                ● Approved
+                            </span>
+                            {% elif r.status == 'Rejected' %}
+                            <span style="background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; padding: .25rem .65rem; border-radius: 1rem; font-size: .8rem; font-weight: 600;">
+                                ● Rejected
+                            </span>
+                            {% else %}
+                            <span style="background: rgba(243, 156, 18, 0.2); color: #f39c12; border: 1px solid #f39c12; padding: .25rem .65rem; border-radius: 1rem; font-size: .8rem; font-weight: 600;">
+                                ● Pending Moderation
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Review Headline & Text -->
+                    <h4 style="margin: 0 0 .35rem; color: #fff; font-size: 1.05rem; font-weight: 600;">{{ r.review_title }}</h4>
+                    <p style="margin: 0 0 1rem; color: var(--text-color); font-size: .92rem; line-height: 1.6; background: rgba(0,0,0,0.2); padding: .85rem 1rem; border-radius: .6rem; border: 1px solid rgba(255,255,255,0.05);">
+                        {{ r.review_text }}
+                    </p>
+
+                    <!-- Admin Reply Box -->
+                    {% if r.admin_reply %}
+                    <div style="background: rgba(255, 72, 32, 0.1); border-left: 3px solid var(--first-color); padding: .75rem 1rem; margin-bottom: 1rem; border-radius: 0 .5rem .5rem 0;">
+                        <strong style="color: var(--first-color); font-size: .88rem; display: block; margin-bottom: .25rem;">Store Admin Reply:</strong>
+                        <p style="margin: 0; font-size: .88rem; color: #fff; line-height: 1.5;">{{ r.admin_reply }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Actions Row -->
+                    <div style="display: flex; gap: .75rem; align-items: center;">
+                        <form action="{{ url_for('story_delete_my_review', review_id=r.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete your review?');">
+                            <button type="submit" style="background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); padding: .4rem .9rem; border-radius: .5rem; font-size: .82rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                                🗑️ Delete Review
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <!-- Empty State Card -->
+            <div style="text-align: center; padding: 4rem 2rem; background: rgba(30, 31, 26, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; color: var(--text-color-light); box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📖</div>
+                <h3 style="color: #fff; margin-bottom: .5rem; font-size: 1.3rem;">No Book Reviews Submitted Yet</h3>
+                <p style="margin-bottom: 1.5rem; font-size: .95rem;">Purchased a book from AK Story Store? Share your thoughts with other readers!</p>
+                <a href="{{ url_for('story_books') }}" class="button" style="display: inline-block; padding: .75rem 1.75rem;">Browse Books Catalog &rarr;</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    {% include 'story_footer.html' %}
+
+</body>
+</html>

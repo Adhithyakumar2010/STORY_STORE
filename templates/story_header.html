@@ -1,0 +1,31 @@
+<header class="header" id="header">
+    <nav class="nav container">
+        <a href="{{ url_for('story_home') }}" class="nav__logo">
+            AK <span>STORY STORE</span>
+        </a>
+
+        <div class="nav__menu" id="nav-menu">
+            <ul class="nav__list">
+                <li><a href="{{ url_for('story_home') }}" class="nav__link {% if active_page == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('story_categories') }}" class="nav__link {% if active_page == 'categories' %}active{% endif %}">Categories</a></li>
+                <li><a href="{{ url_for('story_books') }}" class="nav__link {% if active_page == 'books' %}active{% endif %}">Books</a></li>
+
+                {% if session.get('story_customer_id') %}
+                <li><a href="{{ url_for('story_wishlist') }}" class="nav__link {% if active_page == 'wishlist' %}active{% endif %}">❤️ Wishlist (<span class="wishlist-badge-count">{{ wishlist_count|default(0) }}</span>)</a></li>
+                <li><a href="{{ url_for('story_customer_dashboard') }}" class="nav__link {% if active_page == 'dashboard' %}active{% endif %}">👤 Dashboard</a></li>
+                <li><a href="{{ url_for('story_notifications') }}" class="nav__link {% if active_page == 'notifications' %}active{% endif %}">🔔 Notifications (<span class="notification-badge-count">{{ notification_count|default(0) }}</span>)</a></li>
+                {% else %}
+                <li><a href="{{ url_for('story_customer_login') }}" class="nav__link {% if active_page == 'login' %}active{% endif %}">Login</a></li>
+                <li><a href="{{ url_for('story_wishlist') }}" class="nav__link {% if active_page == 'wishlist' %}active{% endif %}">❤️ Wishlist (<span class="wishlist-badge-count">{{ wishlist_count|default(0) }}</span>)</a></li>
+                <li><a href="{{ url_for('story_notifications') }}" class="nav__link {% if active_page == 'notifications' %}active{% endif %}">🔔 Notifications (<span class="notification-badge-count">{{ notification_count|default(0) }}</span>)</a></li>
+                {% endif %}
+
+                <li>
+                    <a href="{{ url_for('story_cart') }}" class="nav__cart {% if active_page == 'cart' %}active{% endif %}">
+                        🛒 Cart ({{ cart_count|default(0) }})
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>

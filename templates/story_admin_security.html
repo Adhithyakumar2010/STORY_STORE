@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Security Suite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-books.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_security') }}" class="sidebar-link active"><span class="icon">🛡️</span> <span>Security Dashboard</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_2fa_setup') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">🔑</span> <span>2FA Setup</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_security_sessions') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">💻</span> <span>Active Sessions</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_security_audit') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">📜</span> <span>Audit Logs</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_security_password') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">🔐</span> <span>Password Security</span></a></li>
+                <li class="sidebar-item" style="padding-left:1.5rem;"><a href="{{ url_for('story_admin_security_settings') }}" class="sidebar-link" style="font-size:.82rem;"><span class="icon">⚙️</span> <span>Security Settings</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_notifications') }}" class="sidebar-link"><span class="icon">🔔</span> <span>Notifications</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_analytics') }}" class="sidebar-link"><span class="icon">📈</span> <span>Analytics</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_delivery') }}" class="sidebar-link"><span class="icon">🚚</span> <span>Delivery Management</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_email_settings') }}" class="sidebar-link"><span class="icon">📧</span> <span>Email Settings</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_orders') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Orders</span></a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout"><span>🚪</span> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Story Store Admin Security Suite</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <!-- Security Overview Metric Cards Grid -->
+                <div class="stats-grid" style="margin-bottom:2rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(46,204,113,0.2); color:#2ecc71;">🛡️</div>
+                        <div>
+                            <div class="stat-val" style="color:#2ecc71;">{{ sec.security_score|default(85) }}/100</div>
+                            <div class="stat-lbl">System Security Score</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(52,152,219,0.2); color:#3498db;">🔑</div>
+                        <div>
+                            <div class="stat-val">{% if sec.is_2fa_enabled %}ENABLED{% else %}DISABLED{% endif %}</div>
+                            <div class="stat-lbl">2FA Status (<a href="{{ url_for('story_admin_2fa_setup') }}" style="color:var(--first-color);">Setup</a>)</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(155,89,182,0.2); color:#9b59b6;">💻</div>
+                        <div>
+                            <div class="stat-val">1 Active</div>
+                            <div class="stat-lbl">Active Sessions (<a href="{{ url_for('story_admin_security_sessions') }}" style="color:var(--first-color);">Manage</a>)</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(231,76,60,0.2); color:#e74c3c;">⚠️</div>
+                        <div>
+                            <div class="stat-val" style="color:#e74c3c;">{{ failed_logins_count|default(0) }}</div>
+                            <div class="stat-lbl">Failed Login Attempts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-module Quick Navigation Cards -->
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.25rem; margin-bottom:2rem;">
+                    <a href="{{ url_for('story_admin_2fa_setup') }}" class="content-card" style="text-decoration:none; display:block; text-align:center; padding:1.5rem; transition:transform 0.2s;">
+                        <div style="font-size:2rem; margin-bottom:.5rem;">🔑</div>
+                        <h4 style="color:#fff; margin:0 0 .25rem;">2FA Setup</h4>
+                        <p style="color:var(--text-muted); font-size:.8rem; margin:0;">TOTP Authenticator & 10 Recovery Codes</p>
+                    </a>
+                    <a href="{{ url_for('story_admin_security_sessions') }}" class="content-card" style="text-decoration:none; display:block; text-align:center; padding:1.5rem; transition:transform 0.2s;">
+                        <div style="font-size:2rem; margin-bottom:.5rem;">💻</div>
+                        <h4 style="color:#fff; margin:0 0 .25rem;">Active Sessions</h4>
+                        <p style="color:var(--text-muted); font-size:.8rem; margin:0;">Monitor Devices & Revoke Sessions</p>
+                    </a>
+                    <a href="{{ url_for('story_admin_security_audit') }}" class="content-card" style="text-decoration:none; display:block; text-align:center; padding:1.5rem; transition:transform 0.2s;">
+                        <div style="font-size:2rem; margin-bottom:.5rem;">📜</div>
+                        <h4 style="color:#fff; margin:0 0 .25rem;">Audit Logs</h4>
+                        <p style="color:var(--text-muted); font-size:.8rem; margin:0;">Trail History & CSV/PDF Export</p>
+                    </a>
+                    <a href="{{ url_for('story_admin_security_password') }}" class="content-card" style="text-decoration:none; display:block; text-align:center; padding:1.5rem; transition:transform 0.2s;">
+                        <div style="font-size:2rem; margin-bottom:.5rem;">🔐</div>
+                        <h4 style="color:#fff; margin:0 0 .25rem;">Password Security</h4>
+                        <p style="color:var(--text-muted); font-size:.8rem; margin:0;">Strength Meter & Change Password</p>
+                    </a>
+                    <a href="{{ url_for('story_admin_security_settings') }}" class="content-card" style="text-decoration:none; display:block; text-align:center; padding:1.5rem; transition:transform 0.2s;">
+                        <div style="font-size:2rem; margin-bottom:.5rem;">⚙️</div>
+                        <h4 style="color:#fff; margin:0 0 .25rem;">Security Settings</h4>
+                        <p style="color:var(--text-muted); font-size:.8rem; margin:0;">Policies, Logout Timers & Lockouts</p>
+                    </a>
+                </div>
+
+                <!-- Recent System Audit Trail -->
+                <div class="content-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                        <h3 style="color:#fff; margin:0;">Recent Security Audit Logs</h3>
+                        <a href="{{ url_for('story_admin_security_audit') }}" style="color:var(--first-color); font-size:.85rem; text-decoration:none;">View All Logs &rarr;</a>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Admin</th>
+                                    <th>Action</th>
+                                    <th>Module</th>
+                                    <th>IP Address</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if audit_logs %}
+                                {% for a in audit_logs %}
+                                <tr>
+                                    <td><strong style="color:#fff;">{{ a.admin_name }}</strong></td>
+                                    <td><span style="background:rgba(255,255,255,0.1); padding:.2rem .5rem; border-radius:.3rem; font-size:.78rem;">{{ a.action }}</span></td>
+                                    <td>{{ a.module }}</td>
+                                    <td><code>{{ a.ip_address|default('127.0.0.1') }}</code></td>
+                                    <td>{{ a.timestamp }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td><strong style="color:#fff;">Admin</strong></td>
+                                    <td><span style="background:rgba(46,204,113,0.2); color:#2ecc71; padding:.2rem .5rem; border-radius:.3rem; font-size:.78rem;">SECURITY_INIT</span></td>
+                                    <td>SECURITY</td>
+                                    <td><code>127.0.0.1</code></td>
+                                    <td>2026-07-31 20:35:00</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

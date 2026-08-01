@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="story-admin-body" style="background:#161713; color:#fff;">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_home') }}" class="sidebar-brand">AK <span>STORY STORE</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_dashboard') }}" class="sidebar-link active"><span class="icon">🏠</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="#library" class="sidebar-link"><span class="icon">📚</span> <span>My Library</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_rewards') }}" class="sidebar-link"><span class="icon">🎁</span> <span>Rewards & Points</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_wishlist') }}" class="sidebar-link"><span class="icon">❤️</span> <span>Wishlist</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_cart') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Shopping Cart</span></a></li>
+                <li class="sidebar-item"><a href="#reading" class="sidebar-link"><span class="icon">📖</span> <span>Continue Reading</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_my_reviews') }}" class="sidebar-link"><span class="icon">⭐</span> <span>My Reviews</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_addresses') }}" class="sidebar-link"><span class="icon">📍</span> <span>Delivery Addresses</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_notifications') }}" class="sidebar-link"><span class="icon">🔔</span> <span>Notifications</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_profile') }}" class="sidebar-link"><span class="icon">👤</span> <span>My Profile</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_settings') }}" class="sidebar-link"><span class="icon">⚙️</span> <span>Account Settings</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_change_password') }}" class="sidebar-link"><span class="icon">🔒</span> <span>Change Password</span></a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_customer_logout') }}" class="sidebar-logout" style="color:#e74c3c;"><span>🚪</span> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Customer Reader Dashboard</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_home') }}" class="topbar-btn">&larr; Back to Storefront</a>
+                    <a href="{{ url_for('story_customer_logout') }}" class="topbar-btn" style="color:#e74c3c;">Logout</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <!-- Welcome Widget & Loyalty Card -->
+                <div style="background: linear-gradient(135deg, rgba(255,72,32,0.2), rgba(0,0,0,0.6)); border: 1px solid var(--card-border, rgba(255,255,255,0.1)); border-radius: 1rem; padding: 1.75rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                    <div style="display:flex; align-items:center; gap:1.25rem;">
+                        <div style="width:70px; height:70px; border-radius:50%; background:var(--first-color, #ff4820); display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:bold; color:#fff; border:3px solid rgba(255,255,255,0.2);">
+                            {{ customer_name[0]|upper }}
+                        </div>
+                        <div>
+                            <h2 style="color:#fff; margin:0 0 .25rem; font-size:1.5rem;">Welcome back, {{ customer_name }}! 👋</h2>
+                            <p style="color:var(--text-muted, #aaa); margin:0; font-size:.88rem;">Member since {{ member_since|default('2026') }} &middot; <span style="background:gold; color:#000; padding:.1rem .5rem; border-radius:1rem; font-weight:bold; font-size:.75rem;">GOLD MEMBER 👑</span></p>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:1.5rem; border-left:1px solid rgba(255,255,255,0.1); padding-left:1.5rem;">
+                        <div>
+                            <div style="font-size:1.4rem; font-weight:bold; color:var(--first-color, #ff4820);">{{ reward_points|default(350) }} PTS</div>
+                            <div style="font-size:.78rem; color:var(--text-muted, #aaa);">Reward Points</div>
+                        </div>
+                        <div>
+                            <div style="font-size:1.4rem; font-weight:bold; color:#2ecc71;">7 Days 🔥</div>
+                            <div style="font-size:.78rem; color:var(--text-muted, #aaa);">Reading Streak</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Bar -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color:#fff; margin:0 0 1rem; font-size:1.1rem;">⚡ Quick Actions</h3>
+                    <div style="display:flex; gap:1rem; overflow-x:auto; padding-bottom:.5rem;">
+                        <a href="{{ url_for('story_home') }}" class="button" style="padding:.5rem 1rem; font-size:.85rem; white-space:nowrap;">🛍️ Continue Shopping</a>
+                        <a href="{{ url_for('story_categories') }}" class="button" style="padding:.5rem 1rem; font-size:.85rem; white-space:nowrap; background:rgba(255,255,255,0.1);">🏷️ Browse Categories</a>
+                        <a href="{{ url_for('story_books') }}" class="button" style="padding:.5rem 1rem; font-size:.85rem; white-space:nowrap; background:rgba(255,255,255,0.1);">⭐ Best Sellers</a>
+                        <a href="{{ url_for('story_home') }}#flash" class="button" style="padding:.5rem 1rem; font-size:.85rem; white-space:nowrap; background:rgba(255,72,32,0.3);">⚡ Flash Sale</a>
+                    </div>
+                </div>
+
+                <!-- Overview Metric Cards Grid -->
+                <div class="stats-grid" style="margin-bottom:2rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(255,72,32,0.2); color:#ff4820;">📦</div>
+                        <div>
+                            <div class="stat-val">{{ orders_count|default(1) }}</div>
+                            <div class="stat-lbl">Total Orders</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(46,204,113,0.2); color:#2ecc71;">📚</div>
+                        <div>
+                            <div class="stat-val">{{ library_count|default(4) }}</div>
+                            <div class="stat-lbl">Purchased Books</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(231,76,60,0.2); color:#e74c3c;">❤️</div>
+                        <div>
+                            <div class="stat-val">{{ wishlist_count|default(0) }}</div>
+                            <div class="stat-lbl">Wishlist Items</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(52,152,219,0.2); color:#3498db;">🛒</div>
+                        <div>
+                            <div class="stat-val">{{ cart_count|default(0) }}</div>
+                            <div class="stat-lbl">Cart Items</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(241,196,15,0.2); color:#f1c40f;">💰</div>
+                        <div>
+                            <div class="stat-val">₹{{ total_spent|default(1298) }}</div>
+                            <div class="stat-lbl">Total Spent</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Deliveries Shipment Tracker -->
+                {% if active_deliveries %}
+                <div class="content-card" style="margin-bottom:2rem;">
+                    <h3 style="color:#fff; margin:0 0 1rem;">🚚 Active Shipment & Delivery Timeline</h3>
+                    {% for d in active_deliveries %}
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); padding:1.25rem; border-radius:.75rem; margin-bottom:1rem;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:1rem;">
+                            <div>
+                                <strong style="color:#fff;">Tracking #: <code>{{ d.tracking_number }}</code></strong>
+                                <div style="font-size:.82rem; color:var(--text-muted);">Courier: {{ d.courier_name }} &middot; Estimated Delivery: {{ d.estimated_delivery }}</div>
+                            </div>
+                            <span style="background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid #2ecc71; padding:.2rem .6rem; border-radius:1rem; font-size:.75rem; font-weight:bold;">{{ d.shipment_status|upper }}</span>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div style="display:flex; justify-content:space-between; font-size:.75rem; color:var(--text-muted); position:relative; margin-top:.5rem;">
+                            <div style="color:#2ecc71; font-weight:bold;">✓ Ordered</div>
+                            <div style="color:#2ecc71; font-weight:bold;">✓ Packed</div>
+                            <div style="color:var(--first-color); font-weight:bold;">⚡ Shipped</div>
+                            <div>Out for Delivery</div>
+                            <div>Delivered</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- 📚 Digital Library Section -->
+                <div class="content-card" id="library" style="margin-bottom:2rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                        <h3 style="color:#fff; margin:0;">📚 My Purchased eBook Library</h3>
+                        <span style="font-size:.82rem; color:var(--text-muted);">{{ library_count|default(4) }} eBooks owned</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.25rem;">
+                        <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); padding:1rem; border-radius:.75rem; text-align:center;">
+                            <img src="{{ url_for('static', filename='images/story-store/trick-treat1-img.jpeg') }}" alt="Book Cover" style="width:100px; height:140px; object-fit:cover; border-radius:.5rem; margin-bottom:.75rem;">
+                            <h4 style="color:#fff; margin:0 0 .25rem; font-size:.95rem;">The Armor of Light</h4>
+                            <div style="font-size:.78rem; color:var(--text-muted); margin-bottom:.75rem;">Ken Follett &middot; Historical</div>
+                            <div style="background:rgba(255,255,255,0.1); height:6px; border-radius:3px; overflow:hidden; margin-bottom:.75rem;">
+                                <div style="width:65%; height:100%; background:var(--first-color);"></div>
+                            </div>
+                            <a href="{{ url_for('story_book_details', book_id='armor-of-light') }}" class="button" style="padding:.4rem .8rem; font-size:.8rem; width:100%; box-sizing:border-box;">📖 Continue Reading (65%)</a>
+                        </div>
+
+                        <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); padding:1rem; border-radius:.75rem; text-align:center;">
+                            <img src="{{ url_for('static', filename='images/story-store/trick-treat3-img.jpeg') }}" alt="Book Cover" style="width:100px; height:140px; object-fit:cover; border-radius:.5rem; margin-bottom:.75rem;">
+                            <h4 style="color:#fff; margin:0 0 .25rem; font-size:.95rem;">Harry Potter</h4>
+                            <div style="font-size:.78rem; color:var(--text-muted); margin-bottom:.75rem;">J.K. Rowling &middot; Fantasy</div>
+                            <div style="background:rgba(255,255,255,0.1); height:6px; border-radius:3px; overflow:hidden; margin-bottom:.75rem;">
+                                <div style="width:30%; height:100%; background:var(--first-color);"></div>
+                            </div>
+                            <a href="{{ url_for('story_book_details', book_id='harry-potter') }}" class="button" style="padding:.4rem .8rem; font-size:.8rem; width:100%; box-sizing:border-box;">📖 Continue Reading (30%)</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 📖 Reading Statistics Widget -->
+                <div class="content-card" id="reading" style="margin-bottom:2rem;">
+                    <h3 style="color:#fff; margin:0 0 1.25rem;">📊 Reading Analytics & Progress Tracker</h3>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1.25rem;">
+                        <div style="background:rgba(0,0,0,0.4); padding:1rem; border-radius:.5rem; text-align:center;">
+                            <div style="font-size:1.8rem; font-weight:bold; color:var(--first-color);">12</div>
+                            <div style="font-size:.8rem; color:var(--text-muted);">Books Completed</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.4); padding:1rem; border-radius:.5rem; text-align:center;">
+                            <div style="font-size:1.8rem; font-weight:bold; color:#2ecc71;">2</div>
+                            <div style="font-size:.8rem; color:var(--text-muted);">Currently Reading</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.4); padding:1rem; border-radius:.5rem; text-align:center;">
+                            <div style="font-size:1.8rem; font-weight:bold; color:#3498db;">1,420</div>
+                            <div style="font-size:.8rem; color:var(--text-muted);">Pages Read</div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.4); padding:1rem; border-radius:.5rem; text-align:center;">
+                            <div style="font-size:1.8rem; font-weight:bold; color:#9b59b6;">48 Hrs</div>
+                            <div style="font-size:.8rem; color:var(--text-muted);">Hours Read</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders Table -->
+                <div class="content-card" id="orders">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                        <h3 style="color:#fff; margin:0;">📦 Recent Orders & Invoices</h3>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Order Date</th>
+                                    <th>Items</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if orders %}
+                                {% for o in orders %}
+                                <tr>
+                                    <td><strong>#ORD-STORY-{{ o.id }}</strong></td>
+                                    <td>{{ o.created_at|default('2026-07-31') }}</td>
+                                    <td>{{ o.items }}</td>
+                                    <td><strong>₹{{ o.total }}</strong></td>
+                                    <td><span style="background:rgba(46,204,113,0.2); color:#2ecc71; padding:.2rem .5rem; border-radius:.3rem; font-size:.78rem;">COMPLETED</span></td>
+                                    <td>
+                                        <a href="{{ url_for('story_download_receipt', order_id=o.id) }}" class="button" style="padding:.25rem .5rem; font-size:.75rem;">Download Receipt</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td><strong>#ORD-STORY-101</strong></td>
+                                    <td>July 31, 2026</td>
+                                    <td>The Armor of Light, Real Ghost Stories</td>
+                                    <td><strong>₹891</strong></td>
+                                    <td><span style="background:rgba(46,204,113,0.2); color:#2ecc71; padding:.2rem .5rem; border-radius:.3rem; font-size:.78rem;">COMPLETED</span></td>
+                                    <td>
+                                        <a href="{{ url_for('story_download_receipt', order_id=1) }}" class="button" style="padding:.25rem .5rem; font-size:.75rem;">Download Receipt</a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

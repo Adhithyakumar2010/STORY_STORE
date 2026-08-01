@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Customers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link">
+                        <span class="icon">📊</span> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_books') }}" class="sidebar-link">
+                        <span class="icon">📚</span> <span>Books Catalog</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_categories') }}" class="sidebar-link">
+                        <span class="icon">🏷️</span> <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_orders') }}" class="sidebar-link">
+                        <span class="icon">📦</span> <span>Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_customers') }}" class="sidebar-link active">
+                        <span class="icon">👥</span> <span>Customers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_reports') }}" class="sidebar-link">
+                        <span class="icon">📈</span> <span>Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_settings') }}" class="sidebar-link">
+                        <span class="icon">⚙️</span> <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Registered Story Store Customers</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="admin-content">
+                <div class="content-card">
+                    <h3 style="color:#fff; margin:0 0 1.25rem;">Customers Directory ({{ customers|length }})</h3>
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if customers %}
+                                {% for c in customers %}
+                                <tr>
+                                    <td><strong style="color:#fff;">{{ c.name }}</strong></td>
+                                    <td>{{ c.email }}</td>
+                                    <td>{{ c.phone|default('N/A') }}</td>
+                                    <td>
+                                        {% if c.is_verified %}
+                                        <span style="color:#2ecc71; font-weight:600;">✓ Verified</span>
+                                        {% else %}
+                                        <span style="color:#f39c12;">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align:center; padding:3rem; color:var(--text-muted);">No customers found.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

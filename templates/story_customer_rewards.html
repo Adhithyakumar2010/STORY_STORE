@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewards & Points | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="story-admin-body" style="background:#161713; color:#fff;">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_home') }}" class="sidebar-brand">AK <span>STORY STORE</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_dashboard') }}" class="sidebar-link"><span class="icon">🏠</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_rewards') }}" class="sidebar-link active"><span class="icon">🎁</span> <span>Rewards & Points</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_wishlist') }}" class="sidebar-link"><span class="icon">❤️</span> <span>Wishlist</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_cart') }}" class="sidebar-link"><span class="icon">🛒</span> <span>Shopping Cart</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_my_reviews') }}" class="sidebar-link"><span class="icon">⭐</span> <span>My Reviews</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_addresses') }}" class="sidebar-link"><span class="icon">📍</span> <span>Delivery Addresses</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_notifications') }}" class="sidebar-link"><span class="icon">🔔</span> <span>Notifications</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_profile') }}" class="sidebar-link"><span class="icon">👤</span> <span>My Profile</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_settings') }}" class="sidebar-link"><span class="icon">⚙️</span> <span>Account Settings</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_customer_change_password') }}" class="sidebar-link"><span class="icon">🔒</span> <span>Change Password</span></a></li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_customer_logout') }}" class="sidebar-logout" style="color:#e74c3c;"><span>🚪</span> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">🎁 Rewards & Loyalty Program</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_customer_dashboard') }}" class="topbar-btn">&larr; Back to Dashboard</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <!-- Reward Summary Banner -->
+                <div style="background: linear-gradient(135deg, rgba(255,72,32,0.25), rgba(0,0,0,0.8)); border: 1px solid var(--card-border); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                    <div>
+                        <div style="font-size:.9rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Available Balance</div>
+                        <div style="font-size:3rem; font-weight:bold; color:var(--first-color, #ff4820); font-family:sans-serif; margin:.2rem 0;">350 PTS</div>
+                        <div style="font-size:.85rem; color:#aaa;">Lifetime Earned: <strong>500 PTS</strong> &middot; Redeemed: <strong>150 PTS</strong></div>
+                    </div>
+
+                    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:.75rem; padding:1.25rem; width:280px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem;">
+                            <span style="font-size:.85rem; color:#fff;">Membership Tier</span>
+                            <span style="background:gold; color:#000; font-weight:bold; font-size:.75rem; padding:.1rem .5rem; border-radius:1rem;">GOLD TIER 👑</span>
+                        </div>
+                        <div style="font-size:.78rem; color:var(--text-muted); margin-bottom:.5rem;">70% progress to Platinum Tier</div>
+                        <div style="background:rgba(255,255,255,0.1); height:8px; border-radius:4px; overflow:hidden;">
+                            <div style="width:70%; height:100%; background:gold;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Membership Tiers Cards -->
+                <h3 style="color:#fff; margin:0 0 1.25rem;">👑 Membership Tiers</h3>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.25rem; margin-bottom:2.5rem;">
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:.75rem; padding:1.25rem; text-align:center;">
+                        <div style="font-size:2rem; margin-bottom:.5rem;">🥉</div>
+                        <h4 style="color:#cd7f32; margin:0 0 .25rem;">Bronze Tier</h4>
+                        <div style="font-size:.78rem; color:var(--text-muted);">0 - 100 PTS</div>
+                        <p style="font-size:.75rem; color:#aaa; margin-top:.5rem;">1x Points multiplier</p>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:.75rem; padding:1.25rem; text-align:center;">
+                        <div style="font-size:2rem; margin-bottom:.5rem;">🥈</div>
+                        <h4 style="color:#c0c0c0; margin:0 0 .25rem;">Silver Tier</h4>
+                        <div style="font-size:.78rem; color:var(--text-muted);">101 - 300 PTS</div>
+                        <p style="font-size:.75rem; color:#aaa; margin-top:.5rem;">1.25x Points multiplier</p>
+                    </div>
+
+                    <div style="background:rgba(255,72,32,0.15); border:2px solid gold; border-radius:.75rem; padding:1.25rem; text-align:center; position:relative;">
+                        <span style="position:absolute; top:-10px; right:10px; background:gold; color:#000; font-size:.65rem; font-weight:bold; padding:.1rem .4rem; border-radius:1rem;">CURRENT</span>
+                        <div style="font-size:2rem; margin-bottom:.5rem;">🥇</div>
+                        <h4 style="color:gold; margin:0 0 .25rem;">Gold Tier</h4>
+                        <div style="font-size:.78rem; color:var(--text-muted);">301 - 600 PTS</div>
+                        <p style="font-size:.75rem; color:#aaa; margin-top:.5rem;">1.5x Points + Free Shipping</p>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:.75rem; padding:1.25rem; text-align:center;">
+                        <div style="font-size:2rem; margin-bottom:.5rem;">💎</div>
+                        <h4 style="color:#e5e4e2; margin:0 0 .25rem;">Platinum Tier</h4>
+                        <div style="font-size:.78rem; color:var(--text-muted);">601+ PTS</div>
+                        <p style="font-size:.75rem; color:#aaa; margin-top:.5rem;">2x Points + Early Access</p>
+                    </div>
+                </div>
+
+                <!-- Redeem Rewards Section -->
+                <h3 style="color:#fff; margin:0 0 1.25rem;">🎟 Redeem Reward Coupons</h3>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1.25rem; margin-bottom:2.5rem;">
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:.75rem; padding:1.25rem;">
+                        <div style="font-size:1.4rem; font-weight:bold; color:#2ecc71; margin-bottom:.35rem;">₹100 OFF Coupon</div>
+                        <div style="font-size:.8rem; color:var(--text-muted); margin-bottom:1rem;">Valid on any order above ₹499</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:bold; color:var(--first-color);">150 PTS</span>
+                            <form action="{{ url_for('story_customer_rewards') }}" method="post">
+                                <button type="submit" name="redeem_code" value="100OFF" class="button" style="padding:.35rem .75rem; font-size:.8rem;">Redeem Now</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:.75rem; padding:1.25rem;">
+                        <div style="font-size:1.4rem; font-weight:bold; color:#3498db; margin-bottom:.35rem;">₹250 OFF Coupon</div>
+                        <div style="font-size:.8rem; color:var(--text-muted); margin-bottom:1rem;">Valid on any order above ₹999</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:bold; color:var(--first-color);">300 PTS</span>
+                            <form action="{{ url_for('story_customer_rewards') }}" method="post">
+                                <button type="submit" name="redeem_code" value="250OFF" class="button" style="padding:.35rem .75rem; font-size:.8rem;">Redeem Now</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div style="background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:.75rem; padding:1.25rem;">
+                        <div style="font-size:1.4rem; font-weight:bold; color:#f1c40f; margin-bottom:.35rem;">Free Shipping Voucher</div>
+                        <div style="font-size:.8rem; color:var(--text-muted); margin-bottom:1rem;">Valid on all book deliveries</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-weight:bold; color:var(--first-color);">100 PTS</span>
+                            <form action="{{ url_for('story_customer_rewards') }}" method="post">
+                                <button type="submit" name="redeem_code" value="FREESHIP" class="button" style="padding:.35rem .75rem; font-size:.8rem;">Redeem Now</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- How to Earn Points & History Grid -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;" class="grid-container-responsive">
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1rem;">💡 How to Earn Points</h3>
+                        <ul style="list-style:none; padding:0; margin:0; display:grid; gap:.75rem; font-size:.88rem; color:#ccc;">
+                            <li style="display:flex; justify-content:space-between;"><span>📚 Buy Any eBook / Book</span><strong style="color:#2ecc71;">+10 PTS / ₹100</strong></li>
+                            <li style="display:flex; justify-content:space-between;"><span>⭐ Write a Book Review</span><strong style="color:#2ecc71;">+50 PTS</strong></li>
+                            <li style="display:flex; justify-content:space-between;"><span>🔥 Daily Login Streak</span><strong style="color:#2ecc71;">+5 PTS / day</strong></li>
+                            <li style="display:flex; justify-content:space-between;"><span>🎉 Festival Special Bonus</span><strong style="color:#2ecc71;">+100 PTS</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1rem;">📜 Points History</h3>
+                        <table class="admin-table" style="font-size:.8rem;">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Activity</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>July 31, 2026</td>
+                                    <td>Book Purchase (#ORD-101)</td>
+                                    <td><strong style="color:#2ecc71;">+80 PTS</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>July 28, 2026</td>
+                                    <td>Review Bonus</td>
+                                    <td><strong style="color:#2ecc71;">+50 PTS</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>July 20, 2026</td>
+                                    <td>Redeemed ₹100 OFF</td>
+                                    <td><strong style="color:#e74c3c;">-150 PTS</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

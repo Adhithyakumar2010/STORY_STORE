@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Edit Book</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link">
+                        <span class="icon">📊</span> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_books') }}" class="sidebar-link active">
+                        <span class="icon">📚</span> <span>Books Catalog</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_categories') }}" class="sidebar-link">
+                        <span class="icon">🏷️</span> <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_orders') }}" class="sidebar-link">
+                        <span class="icon">📦</span> <span>Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_customers') }}" class="sidebar-link">
+                        <span class="icon">👥</span> <span>Customers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_reports') }}" class="sidebar-link">
+                        <span class="icon">📈</span> <span>Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_settings') }}" class="sidebar-link">
+                        <span class="icon">⚙️</span> <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Edit Book: {{ book.name }}</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_books') }}" class="topbar-btn">&larr; Back to Books</a>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(231,76,60,0.2); border:1px solid #e74c3c; color:#e74c3c; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="content-card">
+                    <form action="{{ url_for('story_admin_book_edit', book_id=book.id) }}" method="post" enctype="multipart/form-data">
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Book Title *</label>
+                                <input type="text" name="title" value="{{ book.name }}" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Author *</label>
+                                <input type="text" name="author" value="{{ book.author|default('') }}" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Publisher</label>
+                                <input type="text" name="publisher" value="{{ book.publisher|default('') }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Category *</label>
+                                <input type="text" name="category" value="{{ book.category }}" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Genre</label>
+                                <input type="text" name="genre" value="{{ book.genre|default('') }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Language</label>
+                                <input type="text" name="language" value="{{ book.language|default('') }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">ISBN (Unique)</label>
+                                <input type="text" name="isbn" value="{{ book.isbn|default('') }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Publication Year</label>
+                                <input type="text" name="pub_date" value="{{ book.pub_date|default('') }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Price (₹) *</label>
+                                <input type="number" name="price" min="0" value="{{ book.price }}" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Discount Price (₹)</label>
+                                <input type="number" name="discount_price" min="0" value="{{ book.discount_price|default(0) }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Stock Quantity *</label>
+                                <input type="number" name="stock" min="0" value="{{ book.stock }}" required style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Pages</label>
+                                <input type="number" name="pages" min="1" value="{{ book.pages|default(300) }}" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:1.5rem;">
+                            <label style="display:block; font-size:.85rem; font-weight:600; color:#fff; margin-bottom:.35rem;">Description</label>
+                            <textarea name="description" rows="4" style="width:100%; box-sizing:border-box; background:rgba(0,0,0,0.5); border:1px solid var(--card-border); color:#fff; padding:.75rem 1rem; border-radius:.5rem;">{{ book.description|default('') }}</textarea>
+                        </div>
+
+                        <!-- Existing Cover Image Preview & Replacement -->
+                        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--card-border); padding:1.25rem; border-radius:.75rem; margin-bottom:1.5rem;">
+                            <h4 style="color:#fff; margin:0 0 1rem;">Update Cover Image & Gallery</h4>
+                            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1.25rem;">
+                                <div>
+                                    <label style="display:block; font-size:.85rem; color:#fff; margin-bottom:.35rem;">Current Cover</label>
+                                    <img src="{{ url_for('static', filename=book.image) }}" alt="Cover" style="height:90px; border-radius:.4rem; display:block; margin-bottom:.5rem;">
+                                    <input type="file" name="cover_image" accept=".jpg,.jpeg,.png,.webp" style="color:#fff;">
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size:.85rem; color:#fff; margin-bottom:.35rem;">Add Gallery Images</label>
+                                    <input type="file" name="gallery_images" accept=".jpg,.jpeg,.png,.webp" multiple style="color:#fff;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; gap:1rem;">
+                            <a href="{{ url_for('story_admin_books') }}" class="topbar-btn" style="background:rgba(255,255,255,0.05);">Cancel</a>
+                            <button type="submit" class="topbar-btn" style="background:var(--first-color); padding:.75rem 1.75rem; font-weight:600;">Update Book &rarr;</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

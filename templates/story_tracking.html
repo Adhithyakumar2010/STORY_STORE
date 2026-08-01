@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Tracking | AK STORY STORE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-store.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-book.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="story-store-body" style="background-color: #161713; color: #fff; min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container nav">
+            <a class="nav__logo" href="{{ url_for('story_home') }}">AK <span>STORY STORE</span></a>
+            <ul class="nav__list">
+                <li><a href="{{ url_for('story_home') }}" class="nav__link">Home</a></li>
+                <li><a href="{{ url_for('story_categories') }}" class="nav__link">Categories</a></li>
+                <li><a href="{{ url_for('story_books') }}" class="nav__link">Books</a></li>
+                <li><a href="{{ url_for('story_my_reviews') }}" class="nav__link"> My Reviews</a></li>
+                <li><a href="{{ url_for('story_addresses') }}" class="nav__link"> Delivery Addresses</a></li>
+                <li><a href="{{ url_for('story_wishlist') }}" class="nav__link">❤️ Wishlist (<span class="wishlist-badge-count">{{ wishlist_count|default(0) }}</span>)</a></li>
+                <li><a href="{{ url_for('story_cart') }}" class="nav__cart">🛒 Cart ({{ cart_count|default(0) }})</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="main section container" style="flex: 1; padding-top: 5.5rem; padding-bottom: 4rem;">
+        <div style="max-width: 800px; margin: 0 auto;">
+
+            <!-- Header Info Card -->
+            <div style="background: rgba(30, 31, 26, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+                <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+                    <div>
+                        <span style="background: rgba(255,72,32,0.15); color: var(--first-color); border: 1px solid rgba(255,72,32,0.3); padding: .25rem .75rem; border-radius: 1rem; font-size: .8rem; font-weight: bold; text-transform: uppercase;">
+                             {{ tracking.courier_name }}
+                        </span>
+                        <h2 style="margin: .6rem 0 .2rem; color: #fff; font-size: 1.5rem;">Tracking #{{ tracking.tracking_number }}</h2>
+                        <span style="color: var(--text-color-light); font-size: .88rem;">Order ID: #ORD-{{ tracking.order_id }}</span>
+                    </div>
+
+                    <div style="text-align: right;">
+                        <span style="display: block; font-size: .8rem; color: var(--text-color-light); margin-bottom: .2rem;">Estimated Delivery</span>
+                        <strong style="color: #2ecc71; font-size: 1.2rem;">{{ tracking.estimated_delivery|default('3 - 5 Business Days') }}</strong>
+                        <div style="font-size: .8rem; color: #f1c40f; margin-top: .2rem;">Status: {{ tracking.shipment_status }}</div>
+                    </div>
+                </div>
+
+                <!-- Current Location Banner -->
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); padding: 1rem 1.25rem; border-radius: .75rem; display: flex; justify-content: space-between; align-items: center; font-size: .9rem;">
+                    <div> Current Location: <strong style="color: #fff;">{{ tracking.current_location|default('Processing Warehouse') }}</strong></div>
+                    <div style="color: var(--text-color-light); font-size: .8rem;">Last Updated: {{ tracking.last_updated }}</div>
+                </div>
+            </div>
+
+            <!-- Vertical Delivery Timeline -->
+            <div style="background: rgba(30, 31, 26, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-bottom: 2rem;">
+                <h3 style="color: #fff; margin: 0 0 1.5rem; font-size: 1.2rem;">Shipment Delivery Progress</h3>
+
+                <div style="display: grid; gap: 1.5rem; position: relative; padding-left: 2rem; border-left: 2px solid rgba(255,255,255,0.15);">
+                    {% set steps = ['Order Confirmed', 'Packed', 'Shipped', 'In Transit', 'Out For Delivery', 'Delivered'] %}
+                    {% for st in steps %}
+                    {% set is_past = true %}
+                    <div style="position: relative;">
+                        <!-- Status Circle Bullet -->
+                        <div style="position: absolute; left: -2.6rem; top: 0; width: 1.25rem; height: 1.25rem; border-radius: 50%; background: {% if tracking.shipment_status == st or (st == 'Order Confirmed') %}#2ecc71{% else %}rgba(255,255,255,0.2){% endif %}; border: 3px solid #161713;"></div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <h4 style="margin: 0; color: {% if tracking.shipment_status == st %}#2ecc71{% else %}#fff{% endif %}; font-size: 1rem;">
+                                    {% if tracking.shipment_status == st %}✓ {% endif %}{{ st }}
+                                </h4>
+                                <p style="margin: .2rem 0 0; color: var(--text-color-light); font-size: .85rem;">
+                                    {% if st == 'Order Confirmed' %}Order placed and payment verified.
+                                    {% elif st == 'Packed' %}Items boxed and quality checked.
+                                    {% elif st == 'Shipped' %}Handed over to {{ tracking.courier_name }}.
+                                    {% elif st == 'In Transit' %}Package en route to local distribution hub.
+                                    {% elif st == 'Out For Delivery' %}Courier agent dispatched for delivery.
+                                    {% elif st == 'Delivered' %}Package safely delivered to recipient.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Detailed Tracking Audit History Logs -->
+            {% if history %}
+            <div style="background: rgba(30, 31, 26, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.25rem; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.4);">
+                <h3 style="color: #fff; margin: 0 0 1.25rem; font-size: 1.2rem;">Tracking Audit History</h3>
+                <div style="display: grid; gap: 1rem;">
+                    {% for h in history %}
+                    <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); padding: .85rem 1.15rem; border-radius: .6rem; display: flex; justify-content: space-between; font-size: .88rem;">
+                        <div>
+                            <strong style="color: #fff;">{{ h.status }}</strong> &middot; <span style="color: var(--first-color);">{{ h.location }}</span>
+                            <p style="margin: .2rem 0 0; color: var(--text-color-light); font-size: .82rem;">{{ h.description }}</p>
+                        </div>
+                        <span style="color: var(--text-color-light); font-size: .8rem;">{{ h.timestamp }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </main>
+
+    <footer class="footer" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.08); padding: 1.5rem 0; text-align: center;">
+        <span class="footer__copy" style="font-size: .85rem; color: var(--text-color-light);">&#169; 2026 AK Story Store. All rights reserved.</span>
+    </footer>
+
+</body>
+</html>

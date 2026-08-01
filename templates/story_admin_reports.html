@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Store Admin | Reports & Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link">
+                        <span class="icon">📊</span> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_books') }}" class="sidebar-link">
+                        <span class="icon">📚</span> <span>Books Catalog</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_categories') }}" class="sidebar-link">
+                        <span class="icon">🏷️</span> <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_orders') }}" class="sidebar-link">
+                        <span class="icon">📦</span> <span>Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_customers') }}" class="sidebar-link">
+                        <span class="icon">👥</span> <span>Customers</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_reports') }}" class="sidebar-link active">
+                        <span class="icon">📈</span> <span>Reports</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('story_admin_settings') }}" class="sidebar-link">
+                        <span class="icon">⚙️</span> <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <a href="{{ url_for('story_admin_logout') }}" class="sidebar-logout">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Sales Reports & Store Analytics</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_dashboard') }}" class="topbar-btn">&larr; Dashboard</a>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="admin-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(46,204,113,0.2); color:#2ecc71;">₹</div>
+                        <div>
+                            <div class="stat-val" style="color:#2ecc71;">₹{{ total_revenue }}</div>
+                            <div class="stat-lbl">Lifetime Revenue</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(255,72,32,0.2); color:#ff4820;">📦</div>
+                        <div>
+                            <div class="stat-val">{{ total_orders }}</div>
+                            <div class="stat-lbl">Completed Purchases</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(52,152,219,0.2); color:#3498db;">⭐</div>
+                        <div>
+                            <div class="stat-val">4.8 / 5.0</div>
+                            <div class="stat-lbl">Average Rating</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                    <!-- Top Selling Books -->
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1rem;">Top Rated Books</h3>
+                        <ul style="list-style:none; padding:0; margin:0;">
+                            {% for b in top_books %}
+                            <li style="display:flex; justify-content:space-between; padding:.75rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                                <div>
+                                    <strong style="color:#fff;">{{ b.name }}</strong>
+                                    <small style="display:block; color:var(--text-muted);">By {{ b.author }}</small>
+                                </div>
+                                <div style="text-align:right;">
+                                    <strong style="color:var(--first-color);">₹{{ b.price }}</strong>
+                                    <small style="display:block; color:#f1c40f;">★ {{ b.rating }}</small>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Best Authors -->
+                    <div class="content-card">
+                        <h3 style="color:#fff; margin:0 0 1rem;">Featured Store Authors</h3>
+                        <ul style="list-style:none; padding:0; margin:0;">
+                            {% for a in best_authors %}
+                            <li style="display:flex; justify-content:space-between; padding:.75rem 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                                <strong style="color:#fff;">{{ a.author }}</strong>
+                                <span style="background:rgba(255,255,255,0.08); padding:.2rem .6rem; border-radius:.3rem; font-size:.8rem;">{{ a.count }} Books</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

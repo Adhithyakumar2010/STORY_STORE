@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Sessions Manager | AK STORY STORE ADMIN</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/story-admin-books.css') }}">
+</head>
+<body class="story-admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-brand">AK <span>STORY ADMIN</span></a>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_dashboard') }}" class="sidebar-link"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_security') }}" class="sidebar-link active"><span class="icon">🛡️</span> <span>Security Dashboard</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_notifications') }}" class="sidebar-link"><span class="icon">🔔</span> <span>Notifications</span></a></li>
+                <li class="sidebar-item"><a href="{{ url_for('story_admin_books') }}" class="sidebar-link"><span class="icon">📚</span> <span>Books Catalog</span></a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <h1 class="topbar-title">Active Sessions & Device Management</h1>
+                <div class="topbar-actions">
+                    <a href="{{ url_for('story_admin_security') }}" class="topbar-btn">&larr; Back to Security</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div style="margin-bottom:1.5rem;">
+                    {% for category, message in messages %}
+                    <div style="background:rgba(46,204,113,0.2); border:1px solid #2ecc71; color:#2ecc71; padding:.85rem 1.25rem; border-radius:.75rem; font-size:.9rem;">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="content-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+                        <h3 style="color:#fff; margin:0;">Active Admin Sessions</h3>
+                        <form action="{{ url_for('story_admin_security_sessions_revoke_others') }}" method="post">
+                            <button type="submit" style="background:rgba(231,76,60,0.2); color:#e74c3c; border:1px solid #e74c3c; padding:.4rem .85rem; border-radius:.5rem; font-weight:bold; cursor:pointer;">Revoke All Other Sessions</button>
+                        </form>
+                    </div>
+
+                    <div style="overflow-x:auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Browser</th>
+                                    <th>IP Address</th>
+                                    <th>Login Time</th>
+                                    <th>Last Activity</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong style="color:#fff;">Desktop (Windows)</strong></td>
+                                    <td>Chrome 125.0</td>
+                                    <td><code>127.0.0.1</code></td>
+                                    <td>Just now</td>
+                                    <td>Just now</td>
+                                    <td><span style="background:rgba(46,204,113,0.2); color:#2ecc71; border:1px solid #2ecc71; padding:.2rem .6rem; border-radius:.3rem; font-weight:bold; font-size:.75rem;">CURRENT SESSION</span></td>
+                                    <td>-</td>
+                                </tr>
+                                {% for s in sessions %}
+                                <tr>
+                                    <td>{{ s.device }}</td>
+                                    <td>{{ s.browser }}</td>
+                                    <td><code>{{ s.ip_address }}</code></td>
+                                    <td>{{ s.login_time }}</td>
+                                    <td>{{ s.last_activity }}</td>
+                                    <td><span style="color:var(--text-muted); font-size:.78rem;">Active</span></td>
+                                    <td>
+                                        <form action="{{ url_for('story_admin_security_sessions_revoke', session_id=s.id) }}" method="post" style="display:inline;">
+                                            <button type="submit" style="background:rgba(231,76,60,0.2); color:#e74c3c; border:none; padding:.25rem .5rem; border-radius:.3rem; font-size:.75rem; cursor:pointer;">Revoke</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
